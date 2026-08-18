@@ -49,6 +49,26 @@
 
   let appointments = [];
   let apptSeq = 1;
+  const API_URL = "api.php";
+
+  async function apiRequest(method, payload) {
+    const options = { method, headers: { "Content-Type": "application/json" }, credentials: "same-origin" };
+    if (payload !== undefined) options.body = JSON.stringify(payload);
+    const response = await fetch(API_URL, options);
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || "Não foi possível concluir a operação.");
+    return data;
+  }
+
+  async function loadAppointments() {
+    try {
+      const data = await apiRequest("GET");
+      appointments = data.appointments || [];
+      renderAppointments();
+    } catch (error) {
+      showToast(error.message);
+    }
+  }
 
   /* ===================================================
      Utilidades
@@ -292,24 +312,27 @@
   /* ===================================================
      Confirmação e lista de consultas
      =================================================== */
-  function confirmAppointment(name, mode) {
+    async function confirmAppointment(name, mode) {
+
     const specialty = SPECIALTIES.find((s) => s.id === state.specialtyId);
     const pro = PROFESSIONALS[state.specialtyId].find((p) => p.id === state.professionalId);
 
-    appointments.push({
-      id: "a" + apptSeq++,
-      patient: name,
-      mode: mode,
-      specialty: specialty.name,
-      professional: pro.name,
-      unit: pro.unit,
-      dateISO: state.dateISO,
-      time: state.time
-    });
-    appointments.sort((a, b) => (a.dateISO + a.time).localeCompare(b.dateISO + b.time));
-
-    renderAppointments();
-    showToast("Consulta agendada com " + pro.name + "!");
+    try {
+      await apiRequest("POST", {
+        patient: name,
+        mode: mode,
+        specialty: specialty.name,
+        professional: pro.name,
+        unit: pro.unit,
+        dateISO: state.dateISO,
+        time: state.time
+      });
+      await loadAppointments();
+      showToast("Consulta agendada com " + pro.name + "!");
+    } catch (error) {
+      setStatus(error.message);
+      return;
+    }
 
     // reset do formulário para um novo agendamento
     state.specialtyId = null;
@@ -349,10 +372,17 @@
 
       const cancelBtn = el("button", "appt-cancel", "Cancelar");
       cancelBtn.type = "button";
-      cancelBtn.addEventListener("click", () => {
-        appointments = appointments.filter((a) => a.id !== appt.id);
-        renderAppointments();
-        showToast("Consulta cancelada.");
+      cancelBtn.addEventListener("click", async () => {
+        cancelBtn.disabled = true;
+        try {
+          await apiRequest("DELETE", { id: appt.id });
+          appointments = appointments.filter((a) => a.id !== appt.id);
+          renderAppointments();
+          showToast("Consulta cancelada.");
+        } catch (error) {
+          cancelBtn.disabled = false;
+          showToast(error.message);
+        }
       });
       card.appendChild(cancelBtn);
       list.appendChild(card);
@@ -391,6 +421,7 @@
   function init() {
     renderSpecialties();
     renderAppointments();
+    loadAppointments();
     goToStep(1);
   }
 
