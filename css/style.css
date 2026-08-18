@@ -3,21 +3,21 @@
    ========================================================= */
 :root{
   /* color */
-  --bg: #F3F7FE;
+  --bg: #F6F9F8;
   --surface: #FFFFFF;
-  --surface-alt: #E7F0FF;
-  --primary: #155EEF;
-  --primary-dark: #123B7A;
-  --primary-tint: #DCEAFF;
-  --accent: #38BDF8;
-  --accent-dark: #0284C7;
-  --text: #10233F;
-  --text-muted: #405675;
-  --border: #B8CBE5;
-  --success: #087F5B;
-  --success-tint: #D9F5EA;
-  --danger: #B42318;
-  --danger-tint: #FEE4E2;
+  --surface-alt: #EAF2EF;
+  --primary: #14483F;
+  --primary-dark: #0D332C;
+  --primary-tint: #E4EFEC;
+  --accent: #E1A730;
+  --accent-dark: #B9820F;
+  --text: #16231F;
+  --text-muted: #51655F;
+  --border: #D3E2DC;
+  --success: #2F8F5B;
+  --success-tint: #E4F4EA;
+  --danger: #C24545;
+  --danger-tint: #FBEAEA;
 
   /* type */
   --font-display: "Fraunces", Georgia, serif;
@@ -29,49 +29,29 @@
   --radius-m: 14px;
   --radius-l: 22px;
   --container: 1140px;
-  --shadow-card: 0 12px 30px -18px rgba(18, 59, 122, 0.28);
-  --shadow-focus: 0 0 0 4px rgba(21, 94, 239, 0.22);
-  --focus-ring: 0 0 0 4px rgba(21, 94, 239, 0.32);
+  --shadow-card: 0 12px 30px -18px rgba(13, 51, 44, 0.35);
+
+  --focus-ring: 0 0 0 3px rgba(20, 72, 63, 0.35);
 }
 
-/* =========================================================
-   Modo acessível — contraste, leitura e interação reforçados
-   ========================================================= */
+/* Accessible mode overrides — the signature interaction of this build */
 body.a11y-mode{
-  --bg: #FFFFFF;
-  --surface: #FFFFFF;
-  --surface-alt: #E6F0FF;
-  --primary: #063B9C;
-  --primary-dark: #062A6B;
-  --primary-tint: #D5E6FF;
-  --accent: #0077B6;
-  --accent-dark: #005A8D;
-  --text: #071A33;
-  --text-muted: #243E62;
-  --border: #6E8FBF;
-  --focus-ring: 0 0 0 5px rgba(0, 90, 141, .32);
-  font-size: 120%;
-  line-height: 1.7;
+  --primary-tint: #D9EAE4;
+  font-size: 118%;
 }
-body.a11y-mode .btn,
-body.a11y-mode .a11y-toggle,
-body.a11y-mode .menu-toggle{ min-height: 52px; }
-body.a11y-mode .btn{ padding-block: 1em; }
-body.a11y-mode *{ letter-spacing: 0.015em; }
-body.a11y-mode h1,
-body.a11y-mode h2,
-body.a11y-mode h3,
-body.a11y-mode h4{ line-height: 1.25; }
+body.a11y-mode .btn{ padding-block: 1.05em; }
+body.a11y-mode{
+  --text-muted: #26362F;
+}
+body.a11y-mode *{
+  letter-spacing: 0.01em;
+}
 body.a11y-mode .option-card,
 body.a11y-mode .professional-row,
 body.a11y-mode .date-chip,
-body.a11y-mode .time-chip,
-body.a11y-mode .form-field input,
-body.a11y-mode .form-field select,
-body.a11y-mode .booking-card,
-body.a11y-mode .appointment-card{ border-width: 2px; }
-body.a11y-mode a{ text-decoration-thickness: 2px; text-underline-offset: 3px; }
-body.a11y-mode .section-alt{ background: #DCEAFF; }
+body.a11y-mode .time-chip{
+  border-width: 2px;
+}
 
 /* =========================================================
    Reset & base
@@ -99,24 +79,9 @@ button{ font-family: inherit; }
 ul, ol{ margin: 0; padding: 0; list-style: none; }
 
 :focus-visible{
-  outline: 3px solid var(--accent-dark);
-  outline-offset: 3px;
+  outline: none;
   box-shadow: var(--focus-ring);
   border-radius: 6px;
-}
-
-@media (prefers-reduced-motion: reduce){
-  *, *::before, *::after{
-    animation-duration: .01ms !important;
-    animation-iteration-count: 1 !important;
-    scroll-behavior: auto !important;
-    transition-duration: .01ms !important;
-  }
-}
-
-@media (forced-colors: active){
-  *, *::before, *::after{ forced-color-adjust: auto; }
-  :focus-visible{ outline: 3px solid Highlight; }
 }
 
 .skip-link{
@@ -836,55 +801,3 @@ ul, ol{ margin: 0; padding: 0; list-style: none; }
 .user-welcome{ color: var(--text-muted); font-size: .85rem; font-weight: 600; white-space: nowrap; }
 .btn-small{ min-height: 38px; padding: .55em 1em; font-size: .85rem; }
 @media (max-width: 900px){ .user-welcome{ display: none; } }
-
-/* =========================================================
-   Refinos de acessibilidade e interação
-   ========================================================= */
-button,
-a,
-input,
-select,
-textarea{ touch-action: manipulation; }
-
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible{
-  position: relative;
-  z-index: 2;
-}
-
-.btn:hover,
-.option-card:hover,
-.professional-row:hover,
-.date-chip:hover,
-.time-chip:hover,
-.a11y-toggle:hover,
-.menu-toggle:hover{
-  box-shadow: var(--shadow-focus);
-}
-
-.btn-primary:focus-visible,
-.btn-primary:hover{
-  background: var(--accent-dark);
-  color: #fff;
-}
-
-.form-field input::placeholder,
-.form-field textarea::placeholder{ color: #58708F; opacity: 1; }
-.form-field input:invalid:not(:placeholder-shown),
-.form-field select:invalid{ border-color: var(--danger); }
-
-.btn:disabled,
-.time-chip:disabled,
-.appt-cancel:disabled{ opacity: .58; filter: grayscale(.2); }
-
-@media (max-width: 640px){
-  .container{ padding-inline: 16px; }
-  .hero-stats{ gap: 18px; flex-wrap: wrap; }
-  .booking-card{ padding: 20px 16px; }
-  .step{ min-width: 100%; }
-  .btn{ width: 100%; }
-  .hero-actions .btn{ width: 100%; }
-}

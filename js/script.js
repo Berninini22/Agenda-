@@ -48,26 +48,31 @@
   };
 
   let appointments = [];
-  let apptSeq = 1;
-  const API_URL = "api.php";
+  const supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_PUBLISHABLE_KEY);
+  let currentUser = null;
 
-  async function apiRequest(method, payload) {
-    const options = { method, headers: { "Content-Type": "application/json" }, credentials: "same-origin" };
-    if (payload !== undefined) options.body = JSON.stringify(payload);
-    const response = await fetch(API_URL, options);
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(data.error || "Não foi possível concluir a operação.");
-    return data;
+  async function requireSession() {
+    const { data, error } = await supabaseClient.auth.getSession();
+    if (error || !data.session) {
+      window.location.replace("auth.html");
+      return false;
+    }
+    currentUser = data.session.user;
+    const welcome = document.getElementById("userWelcome");
+    const fullName = currentUser.user_metadata && currentUser.user_metadata.full_name;
+    welcome.textContent = "Olá, " + (fullName || currentUser.email || "usuário");
+    return true;
   }
 
   async function loadAppointments() {
-    try {
-      const data = await apiRequest("GET");
-      appointments = data.appointments || [];
-      renderAppointments();
-    } catch (error) {
-      showToast(error.message);
-    }
+    const { data, error } = await supabaseClient
+      .from("appointments")
+      .select("id, patient, mode, specialty, professional, unit, date_iso, time")
+      .order("date_iso", { ascending: true })
+      .order("time", { ascending: true });
+    if (error) throw error;
+    appointments = (data || []).map((item) => ({ ...item, dateISO: item.date_iso }));
+    renderAppointments();
   }
 
   /* ===================================================
@@ -318,15 +323,17 @@
     const pro = PROFESSIONALS[state.specialtyId].find((p) => p.id === state.professionalId);
 
     try {
-      await apiRequest("POST", {
+      const { error } = await supabaseClient.from("appointments").insert({
+        user_id: currentUser.id,
         patient: name,
         mode: mode,
         specialty: specialty.name,
         professional: pro.name,
         unit: pro.unit,
-        dateISO: state.dateISO,
+        date_iso: state.dateISO,
         time: state.time
       });
+      if (error) throw error;
       await loadAppointments();
       showToast("Consulta agendada com " + pro.name + "!");
     } catch (error) {
@@ -375,7 +382,8 @@
       cancelBtn.addEventListener("click", async () => {
         cancelBtn.disabled = true;
         try {
-          await apiRequest("DELETE", { id: appt.id });
+          const { error } = await supabaseClient.from("appointments").delete().eq("id", appt.id).eq("user_id", currentUser.id);
+          if (error) throw error;
           appointments = appointments.filter((a) => a.id !== appt.id);
           renderAppointments();
           showToast("Consulta cancelada.");
@@ -418,12 +426,22 @@
   /* ===================================================
      Inicialização
      =================================================== */
-  function init() {
+  async function init() {
+    if (!(await requireSession())) return;
     renderSpecialties();
     renderAppointments();
-    loadAppointments();
+    try {
+      await loadAppointments();
+    } catch (error) {
+      showToast("Não foi possível carregar suas consultas.");
+    }
     goToStep(1);
   }
+
+  document.getElementById("logoutButton").addEventListener("click", async function () {
+    await supabaseClient.auth.signOut();
+    window.location.replace("auth.html");
+  });
 
   document.addEventListener("DOMContentLoaded", init);
 })();
