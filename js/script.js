@@ -12,24 +12,31 @@
     { id: "ortopedia", name: "Ortopedia", icon: "🦴", meta: "Ossos e articulações" }
   ];
 
+  /* Cada profissional pode atender em mais de uma unidade */
+  const UNITS = {
+    centro: { id: "centro", name: "Unidade Centro", address: "Av. Paulista, 1200 — Centro" },
+    norte: { id: "norte", name: "Unidade Norte", address: "Rua Voluntários da Pátria, 450 — Norte" },
+    sul: { id: "sul", name: "Unidade Sul", address: "Av. Interlagos, 980 — Sul" }
+  };
+
   const PROFESSIONALS = {
     clinico: [
-      { id: "p1", name: "Dr. Marcos Vieira", crm: "CRM 12345-SP", unit: "Unidade Centro" },
-      { id: "p2", name: "Dra. Beatriz Nunes", crm: "CRM 22110-SP", unit: "Unidade Norte" }
+      { id: "p1", name: "Dr. Marcos Vieira", crm: "CRM 12345-SP", units: [UNITS.centro, UNITS.norte] },
+      { id: "p2", name: "Dra. Beatriz Nunes", crm: "CRM 22110-SP", units: [UNITS.norte] }
     ],
     cardio: [
-      { id: "p3", name: "Dra. Helena Duarte", crm: "CRM 33456-SP", unit: "Unidade Centro" },
-      { id: "p4", name: "Dr. Otávio Ramos", crm: "CRM 44120-SP", unit: "Unidade Sul" }
+      { id: "p3", name: "Dra. Helena Duarte", crm: "CRM 33456-SP", units: [UNITS.centro, UNITS.sul] },
+      { id: "p4", name: "Dr. Otávio Ramos", crm: "CRM 44120-SP", units: [UNITS.sul] }
     ],
     pediatria: [
-      { id: "p5", name: "Dra. Camila Prado", crm: "CRM 55678-SP", unit: "Unidade Norte" }
+      { id: "p5", name: "Dra. Camila Prado", crm: "CRM 55678-SP", units: [UNITS.norte, UNITS.centro] }
     ],
     dermato: [
-      { id: "p6", name: "Dr. Felipe Costa", crm: "CRM 66789-SP", unit: "Unidade Centro" },
-      { id: "p7", name: "Dra. Renata Lima", crm: "CRM 77234-SP", unit: "Unidade Sul" }
+      { id: "p6", name: "Dr. Felipe Costa", crm: "CRM 66789-SP", units: [UNITS.centro] },
+      { id: "p7", name: "Dra. Renata Lima", crm: "CRM 77234-SP", units: [UNITS.sul, UNITS.norte] }
     ],
     ortopedia: [
-      { id: "p8", name: "Dr. André Silveira", crm: "CRM 88345-SP", unit: "Unidade Sul" }
+      { id: "p8", name: "Dr. André Silveira", crm: "CRM 88345-SP", units: [UNITS.sul, UNITS.centro] }
     ]
   };
 
@@ -44,10 +51,12 @@
     specialtyId: null,
     professionalId: null,
     dateISO: null,
-    time: null
+    time: null,
+    locationId: null
   };
 
   let appointments = [];
+  let doctorDirectory = [];
   const supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_PUBLISHABLE_KEY);
   let currentUser = null;
 
@@ -58,6 +67,10 @@
       return false;
     }
     currentUser = data.session.user;
+    if (currentUser.user_metadata && currentUser.user_metadata.role === "doctor") {
+      window.location.replace("doctor.html");
+      return false;
+    }
     const welcome = document.getElementById("userWelcome");
     const fullName = currentUser.user_metadata && currentUser.user_metadata.full_name;
     welcome.textContent = "Olá, " + (fullName || currentUser.email || "usuário");
@@ -73,6 +86,32 @@
     if (error) throw error;
     appointments = (data || []).map((item) => ({ ...item, dateISO: item.date_iso }));
     renderAppointments();
+  }
+
+  async function loadDoctors() {
+    const { data, error } = await supabaseClient
+      .from("profiles")
+      .select("user_id, full_name, crm, crm_state, specialty, avatar_url, clinic_name, clinic_address")
+      .eq("role", "doctor")
+      .order("full_name", { ascending: true });
+    if (error) return;
+    doctorDirectory = data || [];
+    doctorDirectory.forEach((doctor) => {
+      const specialty = SPECIALTIES.find((item) => item.name === doctor.specialty);
+      if (!specialty || PROFESSIONALS[specialty.id].some((item) => item.user_id === doctor.user_id)) return;
+      PROFESSIONALS[specialty.id].push({
+        id: "doctor-" + doctor.user_id,
+        user_id: doctor.user_id,
+        name: doctor.full_name || "Médico Agenda+",
+        crm: doctor.crm ? "CRM " + doctor.crm + (doctor.crm_state ? "-" + doctor.crm_state : "") : "CRM não informado",
+        avatar_url: doctor.avatar_url || "",
+        units: [{
+          id: "profile-unit-" + doctor.user_id,
+          name: doctor.clinic_name || "Atendimento profissional",
+          address: doctor.clinic_address || "Local a confirmar"
+        }]
+      });
+    });
   }
 
   /* ===================================================
@@ -142,6 +181,7 @@
       card.addEventListener("click", () => {
         state.specialtyId = sp.id;
         state.professionalId = null;
+        state.locationId = null;
         renderSpecialties();
         setStatus("");
       });
@@ -170,14 +210,17 @@
       row.setAttribute("role", "radio");
       row.setAttribute("aria-checked", String(state.professionalId === pro.id));
       const initials = pro.name.split(" ").filter(w => w.length > 2).slice(0, 2).map(w => w[0]).join("");
+      const unitNames = pro.units.map((u) => u.name).join(" · ");
       row.innerHTML =
         '<span class="pro-avatar" aria-hidden="true">' + initials + '</span>' +
         '<span class="pro-info">' +
         '<span class="pro-name">' + pro.name + '</span><br>' +
-        '<span class="pro-meta">' + pro.crm + ' · ' + pro.unit + '</span>' +
+        '<span class="pro-meta">' + pro.crm + '</span><br>' +
+        '<span class="pro-meta">Atende em: ' + unitNames + '</span>' +
         '</span>';
       row.addEventListener("click", () => {
         state.professionalId = pro.id;
+        state.locationId = null;
         renderProfessionals();
         setStatus("");
       });
@@ -236,18 +279,57 @@
   }
 
   /* ===================================================
-     Renderização — Passo 4: Confirmação
+     Renderização — Passo 4: Local de atendimento
+     =================================================== */
+  function renderLocations() {
+    const list = document.getElementById("locationList");
+    const hint = document.getElementById("locationHint");
+    list.innerHTML = "";
+
+    const specialty = SPECIALTIES.find((s) => s.id === state.specialtyId);
+    const pro = specialty ? PROFESSIONALS[specialty.id].find((p) => p.id === state.professionalId) : null;
+
+    if (!pro) {
+      hint.textContent = "Volte e escolha o profissional primeiro.";
+      return;
+    }
+    hint.textContent = "Locais em que " + pro.name + " atende:";
+
+    pro.units.forEach((unit) => {
+      const row = el("button", "professional-row");
+      row.type = "button";
+      row.setAttribute("role", "radio");
+      row.setAttribute("aria-checked", String(state.locationId === unit.id));
+      row.innerHTML =
+        '<span class="pro-avatar" aria-hidden="true">📍</span>' +
+        '<span class="pro-info">' +
+        '<span class="pro-name">' + unit.name + '</span><br>' +
+        '<span class="pro-meta">' + unit.address + '</span>' +
+        '</span>';
+      row.addEventListener("click", () => {
+        state.locationId = unit.id;
+        renderLocations();
+        setStatus("");
+      });
+      list.appendChild(row);
+    });
+  }
+
+  /* ===================================================
+     Renderização — Passo 5: Confirmação
      =================================================== */
   function renderSummary() {
     const card = document.getElementById("summaryCard");
     const specialty = SPECIALTIES.find((s) => s.id === state.specialtyId);
     const pro = specialty ? PROFESSIONALS[specialty.id].find((p) => p.id === state.professionalId) : null;
+    const unit = pro ? pro.units.find((u) => u.id === state.locationId) : null;
 
     card.innerHTML =
       row("Especialidade", specialty ? specialty.name : "—") +
       row("Profissional", pro ? pro.name : "—") +
       row("Data", state.dateISO ? formatFullDate(state.dateISO) : "—") +
-      row("Horário", state.time || "—");
+      row("Horário", state.time || "—") +
+      row("Local", unit ? unit.name + " — " + unit.address : "—");
 
     function row(label, value) {
       return '<div class="sum-row"><span class="sum-label">' + label + '</span><span class="sum-value">' + value + '</span></div>';
@@ -276,11 +358,12 @@
       s.classList.toggle("is-done", idx < n);
     });
     btnBack.disabled = n === 1;
-    btnNext.textContent = n === 4 ? "Confirmar agendamento" : "Continuar";
+    btnNext.textContent = n === 5 ? "Confirmar agendamento" : "Continuar";
 
     if (n === 2) renderProfessionals();
     if (n === 3) { renderDates(); renderTimes(); }
-    if (n === 4) renderSummary();
+    if (n === 4) renderLocations();
+    if (n === 5) renderSummary();
 
     setStatus("");
     document.querySelector(".booking-card").scrollIntoView({ behavior: "smooth", block: "start" });
@@ -290,17 +373,18 @@
     if (n === 1 && !state.specialtyId) return "Escolha uma especialidade para continuar.";
     if (n === 2 && !state.professionalId) return "Escolha um profissional para continuar.";
     if (n === 3 && (!state.dateISO || !state.time)) return "Escolha a data e o horário para continuar.";
+    if (n === 4 && !state.locationId) return "Escolha o local de atendimento para continuar.";
     return "";
   }
 
   btnNext.addEventListener("click", () => {
-    if (state.step < 4) {
+    if (state.step < 5) {
       const error = validateStep(state.step);
       if (error) { setStatus(error); return; }
       goToStep(state.step + 1);
       return;
     }
-    // step 4: confirmar
+    // step 5: confirmar
     const nameInput = document.getElementById("patientName");
     if (!nameInput.value.trim()) {
       setStatus("Digite o nome do paciente para confirmar.");
@@ -321,6 +405,7 @@
 
     const specialty = SPECIALTIES.find((s) => s.id === state.specialtyId);
     const pro = PROFESSIONALS[state.specialtyId].find((p) => p.id === state.professionalId);
+    const unit = pro.units.find((u) => u.id === state.locationId);
 
     try {
       const { error } = await supabaseClient.from("appointments").insert({
@@ -329,13 +414,14 @@
         mode: mode,
         specialty: specialty.name,
         professional: pro.name,
-        unit: pro.unit,
+        doctor_id: pro.user_id || null,
+        unit: unit.name,
         date_iso: state.dateISO,
         time: state.time
       });
       if (error) throw error;
       await loadAppointments();
-      showToast("Consulta agendada com " + pro.name + "!");
+      showToast("Consulta agendada com " + pro.name + " em " + unit.name + "!");
     } catch (error) {
       setStatus(error.message);
       return;
@@ -346,6 +432,7 @@
     state.professionalId = null;
     state.dateISO = null;
     state.time = null;
+    state.locationId = null;
     document.getElementById("patientName").value = "";
     renderSpecialties();
     goToStep(1);
@@ -428,6 +515,7 @@
      =================================================== */
   async function init() {
     if (!(await requireSession())) return;
+    await loadDoctors();
     renderSpecialties();
     renderAppointments();
     try {

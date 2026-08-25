@@ -26,6 +26,56 @@
           <label for="name">Nome completo</label>
           <input id="name" name="name" type="text" autocomplete="name" maxlength="120">
         </div>
+
+        <fieldset class="role-field" id="roleField" hidden>
+          <legend>Como você vai usar o Agenda+?</legend>
+          <div class="role-options">
+            <label class="role-option is-selected" id="patientRoleOption">
+              <input type="radio" name="role" value="patient" checked>
+              <span class="role-option-copy"><strong>Sou paciente</strong><small>Agendar e acompanhar consultas</small></span>
+            </label>
+            <label class="role-option" id="doctorRoleOption">
+              <input type="radio" name="role" value="doctor">
+              <span class="role-option-copy"><strong>Sou médico</strong><small>Gerenciar minha agenda profissional</small></span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div class="doctor-fields" id="doctorFields" hidden>
+          <div class="doctor-fields-heading">
+            <span class="section-kicker">Cadastro profissional</span>
+            <p>Essas informações aparecem no seu perfil e ajudam os pacientes a encontrar você.</p>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label for="crm">Número do CRM</label>
+              <input id="crm" name="crm" type="text" autocomplete="off" maxlength="30" placeholder="Ex.: 123456">
+            </div>
+            <div class="form-field">
+              <label for="crmState">UF do CRM</label>
+              <select id="crmState" name="crmState">
+                <option value="">Selecione</option>
+                <option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="specialty">Especialidade principal</label>
+            <select id="specialty" name="specialty">
+              <option value="">Selecione sua especialidade</option>
+              <option>Clínico Geral</option>
+              <option>Cardiologia</option>
+              <option>Pediatria</option>
+              <option>Dermatologia</option>
+              <option>Ortopedia</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="phone">Telefone profissional <span class="optional-label">(opcional)</span></label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel" maxlength="20" placeholder="(14) 99999-9999">
+          </div>
+        </div>
+
         <div class="form-field">
           <label for="email">E-mail</label>
           <input id="email" name="email" type="email" autocomplete="email" required>

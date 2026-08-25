@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel médico | Agenda+</title>
+  <meta name="description" content="Painel profissional do médico no Agenda+.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="doctor-page">
+  <a class="skip-link" href="#doctor-content">Pular para o conteúdo</a>
+
+  <header class="site-header doctor-site-header">
+    <div class="container header-bar">
+      <a class="brand" href="doctor.html" aria-label="Agenda+ — painel médico">
+        <span class="brand-mark" aria-hidden="true">+</span>
+        <span class="brand-name">Agenda<span class="brand-plus">+</span></span>
+      </a>
+      <div class="doctor-header-context"><span class="status-dot"></span> Painel profissional</div>
+      <div class="header-actions">
+        <span class="user-welcome" id="doctorWelcome">Olá</span>
+        <button type="button" class="a11y-toggle" id="a11yToggle" aria-pressed="false">
+          <span class="a11y-icon" aria-hidden="true">Aa</span>
+          <span>Modo acessível</span>
+        </button>
+        <button class="btn btn-ghost btn-small" type="button" id="logoutButton">Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="doctor-content">
+    <section class="doctor-hero">
+      <div class="container doctor-hero-grid">
+        <div>
+          <p class="eyebrow">Painel profissional · <span id="todayLabel">Hoje</span></p>
+          <h1>Olá, <span id="doctorName">doutor(a)</span>.</h1>
+          <p class="hero-lead">Sua agenda, seus horários e os próximos atendimentos organizados em um só lugar.</p>
+        </div>
+        <div class="doctor-hero-date" aria-label="Data de hoje">
+          <span class="date-label">Agenda de hoje</span>
+          <strong id="heroDate">—</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="section doctor-dashboard-section">
+      <div class="container">
+        <div class="dashboard-grid">
+          <div class="dashboard-main">
+            <div class="section-head dashboard-section-head">
+              <div>
+                <p class="eyebrow">Visão geral</p>
+                <h2>Sua agenda</h2>
+              </div>
+              <span class="sync-label" id="lastSync">Atualizado agora</span>
+            </div>
+
+            <div class="metric-grid" aria-label="Resumo da agenda">
+              <article class="metric-card metric-card-primary">
+                <span class="metric-label">Hoje</span>
+                <strong class="metric-value" id="todayCount">0</strong>
+                <span class="metric-note">atendimentos marcados</span>
+              </article>
+              <article class="metric-card">
+                <span class="metric-label">Próximos 7 dias</span>
+                <strong class="metric-value" id="weekCount">0</strong>
+                <span class="metric-note">consultas confirmadas</span>
+              </article>
+              <article class="metric-card">
+                <span class="metric-label">Horários ativos</span>
+                <strong class="metric-value" id="activeDaysCount">5</strong>
+                <span class="metric-note">dias nesta semana</span>
+              </article>
+            </div>
+
+            <article class="dashboard-card next-appointment-card" id="nextAppointmentCard">
+              <div class="card-heading-row">
+                <div>
+                  <span class="section-kicker">Próximo atendimento</span>
+                  <h3 id="nextAppointmentTitle">Sua agenda está livre</h3>
+                </div>
+                <span class="appointment-status-pill" id="nextAppointmentStatus">Disponível</span>
+              </div>
+              <div class="next-appointment-content" id="nextAppointmentContent">
+                <div class="next-appointment-placeholder"><span class="placeholder-icon" aria-hidden="true">✦</span><p>Quando um paciente agendar com você, o atendimento aparecerá aqui.</p></div>
+              </div>
+            </article>
+
+            <article class="dashboard-card">
+              <div class="card-heading-row">
+                <div>
+                  <span class="section-kicker">Agenda</span>
+                  <h3>Consultas recebidas</h3>
+                </div>
+                <button type="button" class="link-button" id="refreshAppointments">Atualizar</button>
+              </div>
+              <div class="doctor-appointments-list" id="doctorAppointmentsList"></div>
+              <p class="empty-state compact-empty" id="doctorEmptyState">Nenhuma consulta encontrada para os próximos dias.</p>
+            </article>
+          </div>
+
+          <aside class="dashboard-sidebar">
+            <article class="dashboard-card profile-card">
+              <div class="profile-card-top">
+                <div class="doctor-avatar-wrap">
+                  <div class="doctor-avatar doctor-avatar-large" id="doctorAvatar" aria-label="Foto do médico">DR</div>
+                  <label class="avatar-upload" for="avatarInput" title="Adicionar foto">
+                    <span aria-hidden="true">+</span>
+                    <span class="sr-only">Adicionar ou trocar foto de perfil</span>
+                  </label>
+                  <input id="avatarInput" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+                </div>
+                <div>
+                  <span class="section-kicker">Seu perfil</span>
+                  <h3 id="profileName">—</h3>
+                  <p class="profile-specialty" id="profileSpecialty">—</p>
+                </div>
+              </div>
+              <div class="profile-details" id="profileDetails"></div>
+              <p class="profile-helper">Clique no botão sobre a foto para atualizar sua imagem.</p>
+            </article>
+
+            <article class="dashboard-card availability-card" id="horarios">
+              <div class="card-heading-row">
+                <div>
+                  <span class="section-kicker">Disponibilidade</span>
+                  <h3>Meus horários</h3>
+                </div>
+                <span class="availability-count" id="availabilityCount">5 dias</span>
+              </div>
+              <p class="card-description">Defina os dias e o período em que os pacientes podem encontrar você.</p>
+              <form id="availabilityForm" class="availability-form">
+                <div class="availability-row" data-day="monday"><label><input type="checkbox" checked> <span>Segunda-feira</span></label><div class="availability-times"><input aria-label="Início segunda-feira" type="time" value="08:00"><span>até</span><input aria-label="Fim segunda-feira" type="time" value="18:00"></div></div>
+                <div class="availability-row" data-day="tuesday"><label><input type="checkbox" checked> <span>Terça-feira</span></label><div class="availability-times"><input aria-label="Início terça-feira" type="time" value="08:00"><span>até</span><input aria-label="Fim terça-feira" type="time" value="18:00"></div></div>
+                <div class="availability-row" data-day="wednesday"><label><input type="checkbox" checked> <span>Quarta-feira</span></label><div class="availability-times"><input aria-label="Início quarta-feira" type="time" value="08:00"><span>até</span><input aria-label="Fim quarta-feira" type="time" value="18:00"></div></div>
+                <div class="availability-row" data-day="thursday"><label><input type="checkbox" checked> <span>Quinta-feira</span></label><div class="availability-times"><input aria-label="Início quinta-feira" type="time" value="08:00"><span>até</span><input aria-label="Fim quinta-feira" type="time" value="18:00"></div></div>
+                <div class="availability-row" data-day="friday"><label><input type="checkbox" checked> <span>Sexta-feira</span></label><div class="availability-times"><input aria-label="Início sexta-feira" type="time" value="08:00"><span>até</span><input aria-label="Fim sexta-feira" type="time" value="18:00"></div></div>
+                <div class="availability-row" data-day="saturday"><label><input type="checkbox"> <span>Sábado</span></label><div class="availability-times"><input aria-label="Início sábado" type="time" value="08:00"><span>até</span><input aria-label="Fim sábado" type="time" value="12:00"></div></div>
+                <div class="availability-row" data-day="sunday"><label><input type="checkbox"> <span>Domingo</span></label><div class="availability-times"><input aria-label="Início domingo" type="time" value="08:00"><span>até</span><input aria-label="Fim domingo" type="time" value="12:00"></div></div>
+                <button class="btn btn-primary btn-block" type="submit" id="saveAvailability">Salvar horários</button>
+              </form>
+            </article>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/doctor.js"></script>
+</body>
+</html>

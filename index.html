@@ -31,6 +31,7 @@
 
     <div class="header-actions">
       <span class="user-welcome" id="userWelcome">Olá</span>
+      <a class="doctor-access" href="auth.html?mode=register">Sou médico</a>
       <button class="btn btn-ghost btn-small" type="button" id="logoutButton">Sair</button>
       <button type="button" class="a11y-toggle" id="a11yToggle" aria-pressed="false">
         <span class="a11y-icon" aria-hidden="true">Aa</span>
@@ -117,6 +118,10 @@
           </li>
           <li class="step" data-step="4">
             <span class="step-index">4</span>
+            <span class="step-label">Local</span>
+          </li>
+          <li class="step" data-step="5">
+            <span class="step-index">5</span>
             <span class="step-label">Confirmação</span>
           </li>
         </ol>
@@ -141,8 +146,15 @@
           <div class="time-grid" id="timeGrid" role="radiogroup" aria-label="Escolha o horário"></div>
         </div>
 
-        <!-- Step 4: Confirmação -->
+        <!-- Step 4: Local de atendimento -->
         <div class="step-panel" data-panel="4">
+          <h3 class="panel-title">Escolha o local de atendimento</h3>
+          <p class="panel-hint" id="locationHint"></p>
+          <div class="option-list" id="locationList" role="radiogroup" aria-label="Escolha o local de atendimento"></div>
+        </div>
+
+        <!-- Step 5: Confirmação -->
+        <div class="step-panel" data-panel="5">
           <h3 class="panel-title">Confira e confirme</h3>
           <div class="summary-card" id="summaryCard"></div>
           <div class="form-field">

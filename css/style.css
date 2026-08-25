@@ -801,3 +801,155 @@ ul, ol{ margin: 0; padding: 0; list-style: none; }
 .user-welcome{ color: var(--text-muted); font-size: .85rem; font-weight: 600; white-space: nowrap; }
 .btn-small{ min-height: 38px; padding: .55em 1em; font-size: .85rem; }
 @media (max-width: 900px){ .user-welcome{ display: none; } }
+
+/* =========================================================
+   Cadastro profissional
+   ========================================================= */
+.role-field{ border: 0; padding: 0; margin: 0; min-width: 0; }
+.role-field legend{ font-size: .84rem; font-weight: 700; margin-bottom: 9px; }
+.role-options{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.role-option{
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease, transform .18s ease;
+}
+.role-option:hover{ border-color: var(--accent); transform: translateY(-1px); }
+.role-option.is-selected{ border-color: var(--accent-dark); background: var(--accent-tint); box-shadow: inset 0 0 0 1px var(--accent-dark); }
+.role-option input{ accent-color: var(--accent-dark); margin-top: 2px; }
+.role-option-copy{ display: grid; gap: 4px; }
+.role-option-copy strong{ font-size: .88rem; color: var(--text); }
+.role-option-copy small{ color: var(--text-muted); font-size: .74rem; line-height: 1.35; }
+.doctor-fields{ display: grid; gap: 15px; padding: 18px; border: 1px solid var(--border); border-radius: 14px; background: #fbfaf5; }
+.doctor-fields[hidden], [hidden]{ display: none !important; }
+.doctor-fields-heading{ display: grid; gap: 4px; }
+.doctor-fields-heading p{ color: var(--text-muted); font-size: .82rem; margin: 0; line-height: 1.45; }
+.form-grid-2{ display: grid; grid-template-columns: 1fr .75fr; gap: 14px; }
+.optional-label{ color: var(--text-muted); font-weight: 400; font-size: .78rem; }
+.auth-error:empty{ display: none; }
+.auth-error.is-success{ border-color: #8db69d; background: #eef8f1; color: #286443; }
+.doctor-access{ color: var(--accent-dark); font-size: .82rem; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.doctor-access:hover{ text-decoration: underline; }
+
+/* =========================================================
+   Painel médico
+   ========================================================= */
+.doctor-page{ background: var(--bg); }
+.doctor-site-header{ background: rgba(255,255,255,.93); }
+.doctor-header-context{ display: inline-flex; align-items: center; gap: 7px; color: var(--text-muted); font-family: var(--font-mono); font-size: .72rem; letter-spacing: .02em; margin-left: auto; margin-right: 18px; text-transform: uppercase; }
+.status-dot{ width: 7px; height: 7px; border-radius: 50%; background: #4e9b6b; box-shadow: 0 0 0 4px #e6f3e9; }
+.doctor-hero{ padding: 58px 0 46px; background: linear-gradient(120deg, #edf5ef 0%, #f8f5eb 70%, #f1ead9 100%); border-bottom: 1px solid var(--border); }
+.doctor-hero-grid{ display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: end; }
+.doctor-hero h1{ max-width: 720px; margin: 8px 0 12px; font-size: clamp(2.35rem, 5vw, 4.3rem); }
+.doctor-hero .hero-lead{ max-width: 620px; margin: 0; }
+.doctor-hero-date{ min-width: 194px; padding: 20px 22px; border: 1px solid rgba(44,77,60,.15); border-radius: 18px; background: rgba(255,255,255,.62); }
+.date-label{ display: block; color: var(--text-muted); font-family: var(--font-mono); font-size: .7rem; letter-spacing: .06em; text-transform: uppercase; }
+.doctor-hero-date strong{ display: block; color: var(--primary-dark); font-family: var(--font-display); font-size: 1.35rem; margin-top: 7px; }
+.doctor-dashboard-section{ padding-top: 42px; }
+.dashboard-grid{ display: grid; grid-template-columns: minmax(0, 1fr) 350px; gap: 22px; align-items: start; }
+.dashboard-main, .dashboard-sidebar{ display: grid; gap: 22px; min-width: 0; }
+.dashboard-section-head{ display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 0; }
+.dashboard-section-head h2{ margin-bottom: 0; }
+.sync-label{ color: var(--text-muted); font-family: var(--font-mono); font-size: .72rem; }
+.metric-grid{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.metric-card{ display: grid; gap: 5px; min-height: 138px; padding: 19px 20px; border: 1px solid var(--border); border-radius: var(--radius-m); background: var(--surface); box-shadow: 0 8px 24px rgba(30,62,49,.05); }
+.metric-card-primary{ background: var(--primary-dark); border-color: var(--primary-dark); color: #fff; }
+.metric-label{ color: var(--text-muted); font-family: var(--font-mono); font-size: .68rem; letter-spacing: .04em; text-transform: uppercase; }
+.metric-card-primary .metric-label, .metric-card-primary .metric-note{ color: rgba(255,255,255,.72); }
+.metric-value{ color: var(--primary-dark); font-family: var(--font-display); font-size: 2.7rem; line-height: 1; margin: 6px 0 1px; }
+.metric-card-primary .metric-value{ color: #fff; }
+.metric-note{ color: var(--text-muted); font-size: .77rem; }
+.dashboard-card{ padding: 22px; border: 1px solid var(--border); border-radius: var(--radius-m); background: var(--surface); box-shadow: 0 8px 24px rgba(30,62,49,.05); }
+.card-heading-row{ display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.card-heading-row h3{ margin: 5px 0 0; font-size: 1.2rem; }
+.section-kicker{ color: var(--accent-dark); font-family: var(--font-mono); font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.card-description{ color: var(--text-muted); font-size: .83rem; line-height: 1.5; margin: 11px 0 17px; }
+.next-appointment-card{ background: #fffdf8; }
+.appointment-status-pill, .doctor-appt-status{ display: inline-flex; align-items: center; white-space: nowrap; padding: 6px 10px; border-radius: 999px; background: #f5eee0; color: #866630; font-family: var(--font-mono); font-size: .68rem; font-weight: 700; }
+.appointment-status-pill.is-confirmed, .doctor-appt-status{ background: var(--success-tint); color: var(--success); }
+.next-appointment-content{ display: flex; align-items: center; gap: 18px; min-height: 84px; margin-top: 18px; padding-top: 17px; border-top: 1px solid var(--border); }
+.next-date-block{ display: grid; min-width: 88px; gap: 3px; padding-right: 18px; border-right: 1px solid var(--border); }
+.next-date-block strong{ color: var(--primary-dark); font-family: var(--font-display); font-size: 1.6rem; }
+.next-date-block span{ color: var(--text-muted); font-size: .74rem; text-transform: capitalize; }
+.next-patient{ display: flex; align-items: center; gap: 11px; min-width: 0; flex: 1; }
+.next-patient > div{ display: grid; gap: 4px; min-width: 0; }
+.next-patient strong, .next-patient span{ overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.next-patient strong{ color: var(--text); }
+.next-patient > div > span{ color: var(--text-muted); font-size: .76rem; }
+.patient-avatar, .doctor-avatar{ display: grid; place-items: center; flex: 0 0 auto; border-radius: 50%; background: var(--accent-tint); color: var(--accent-dark); font-family: var(--font-mono); font-weight: 700; }
+.patient-avatar{ width: 39px; height: 39px; font-size: .7rem; }
+.next-specialty{ color: var(--text-muted); font-size: .78rem; text-align: right; }
+.next-appointment-placeholder{ display: flex; align-items: center; gap: 12px; color: var(--text-muted); font-size: .84rem; }
+.next-appointment-placeholder p{ margin: 0; }
+.placeholder-icon{ display: grid; place-items: center; width: 39px; height: 39px; flex: 0 0 auto; border-radius: 12px; background: var(--accent-tint); color: var(--accent-dark); font-size: 1.1rem; }
+.doctor-appointments-list{ display: grid; gap: 0; margin-top: 17px; }
+.doctor-appointment-row{ display: flex; align-items: center; gap: 13px; padding: 13px 0; border-top: 1px solid var(--border); }
+.doctor-appt-date{ display: grid; place-items: center; flex: 0 0 53px; padding: 7px 4px; border-radius: 10px; background: var(--primary-dark); color: #fff; text-align: center; }
+.doctor-appt-date span{ font-family: var(--font-mono); font-size: .62rem; opacity: .72; text-transform: uppercase; }
+.doctor-appt-date strong{ font-size: 1.12rem; line-height: 1.15; }
+.doctor-appt-info{ display: grid; gap: 2px; min-width: 0; flex: 1; }
+.doctor-appt-info strong, .doctor-appt-info span, .doctor-appt-info small{ overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.doctor-appt-info span{ color: var(--primary-dark); font-size: .8rem; font-weight: 600; }
+.doctor-appt-info small{ color: var(--text-muted); font-size: .73rem; }
+.doctor-appt-status{ font-size: .62rem; }
+.compact-empty{ margin: 16px 0 0; padding: 18px; font-size: .83rem; }
+.profile-card-top{ display: flex; align-items: center; gap: 14px; }
+.profile-card h3{ margin: 4px 0 3px; font-size: 1.07rem; }
+.profile-specialty{ color: var(--text-muted); font-size: .8rem; margin: 0; }
+.doctor-avatar-wrap{ position: relative; flex: 0 0 auto; }
+.doctor-avatar-large{ width: 70px; height: 70px; background: var(--primary-dark); color: #fff; font-size: 1.1rem; border: 4px solid #eef5ef; background-size: cover; background-position: center; }
+.doctor-avatar-large.has-photo{ background-color: var(--surface); }
+.avatar-upload{ position: absolute; right: -2px; bottom: -2px; display: grid; place-items: center; width: 25px; height: 25px; border: 2px solid var(--surface); border-radius: 50%; background: var(--accent); color: var(--primary-dark); font-size: 1.1rem; line-height: 1; cursor: pointer; }
+.avatar-upload:hover{ background: var(--accent-dark); color: #fff; }
+.profile-details{ display: grid; gap: 10px; margin-top: 20px; padding-top: 17px; border-top: 1px solid var(--border); }
+.profile-detail{ display: flex; align-items: center; gap: 10px; }
+.detail-icon{ display: grid; place-items: center; width: 26px; height: 26px; flex: 0 0 auto; border-radius: 8px; background: var(--bg); color: var(--accent-dark); font-family: var(--font-mono); font-size: .57rem; font-weight: 700; }
+.profile-detail > span:last-child{ display: grid; gap: 2px; min-width: 0; }
+.profile-detail small{ color: var(--text-muted); font-size: .67rem; }
+.profile-detail strong{ overflow: hidden; color: var(--text); font-size: .78rem; text-overflow: ellipsis; white-space: nowrap; }
+.profile-helper{ color: var(--text-muted); font-size: .7rem; line-height: 1.4; margin: 15px 0 0; }
+.availability-count{ color: var(--accent-dark); font-family: var(--font-mono); font-size: .7rem; font-weight: 700; }
+.availability-form{ display: grid; gap: 0; }
+.availability-row{ display: flex; align-items: center; justify-content: space-between; gap: 9px; padding: 11px 0; border-top: 1px solid var(--border); }
+.availability-row label{ display: flex; align-items: center; gap: 7px; min-width: 0; color: var(--text); font-size: .76rem; }
+.availability-row label span{ overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.availability-row label input{ accent-color: var(--accent-dark); }
+.availability-times{ display: flex; align-items: center; gap: 4px; color: var(--text-muted); font-size: .65rem; }
+.availability-times input{ width: 75px; padding: 7px 5px; border: 1px solid var(--border); border-radius: 7px; background: var(--bg); color: var(--text); font-size: .7rem; }
+.availability-row.is-disabled .availability-times{ opacity: .4; }
+.availability-row.is-disabled .availability-times input{ pointer-events: none; }
+.btn-block{ width: 100%; margin-top: 14px; }
+.sr-only{ position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+@media (max-width: 1000px){
+  .dashboard-grid{ grid-template-columns: 1fr; }
+  .dashboard-sidebar{ grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+}
+@media (max-width: 720px){
+  .doctor-header-context{ display: none; }
+  .doctor-site-header .header-actions{ margin-left: auto; }
+  .doctor-hero{ padding: 38px 0 30px; }
+  .doctor-hero-grid{ grid-template-columns: 1fr; gap: 22px; }
+  .doctor-hero-date{ width: fit-content; min-width: 0; }
+  .metric-grid{ gap: 9px; }
+  .metric-card{ min-height: 120px; padding: 15px; }
+  .metric-value{ font-size: 2.15rem; }
+  .dashboard-card{ padding: 18px; }
+  .dashboard-sidebar{ grid-template-columns: 1fr; }
+  .next-appointment-content{ align-items: flex-start; flex-wrap: wrap; }
+  .next-specialty{ margin-left: 106px; text-align: left; }
+  .role-options, .form-grid-2{ grid-template-columns: 1fr; }
+}
+@media (max-width: 460px){
+  .metric-note{ font-size: .67rem; }
+  .metric-label{ font-size: .6rem; }
+  .doctor-appt-status{ display: none; }
+  .availability-row{ align-items: flex-start; flex-direction: column; }
+  .availability-times{ width: 100%; margin-left: 23px; }
+  .availability-times input{ width: 92px; }
+}
