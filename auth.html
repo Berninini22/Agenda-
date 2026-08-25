@@ -8,12 +8,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=3">
 </head>
 <body class="auth-page">
   <main class="auth-shell">
     <section class="auth-card" aria-labelledby="authTitle">
-      <a class="auth-brand" href="auth.html" aria-label="Agenda+ — início">
+      <a class="auth-brand" href="home.html" aria-label="Agenda+ — início">
         <span class="brand-mark" aria-hidden="true">+</span>
         <span class="brand-name">Agenda<span class="brand-plus">+</span></span>
       </a>
@@ -40,6 +40,11 @@
             </label>
           </div>
         </fieldset>
+
+        <div class="auth-doctor-callout auth-doctor-callout-inline" id="doctorCallout">
+          <span id="doctorCalloutText"><strong>É médico?</strong> Crie seu acesso profissional.</span>
+          <button type="button" class="link-button" id="doctorRegisterLink">Sou médico</button>
+        </div>
 
         <div class="doctor-fields" id="doctorFields" hidden>
           <div class="doctor-fields-heading">
@@ -92,11 +97,11 @@
       <p class="auth-switch" id="authSwitchText">Ainda não tem uma conta?
         <button type="button" class="link-button" id="toggleMode">Criar conta</button>
       </p>
-      <a class="auth-back" href="index.html">Voltar para o início</a>
+      <a class="auth-back" href="home.html">Voltar para o início</a>
     </section>
   </main>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase-config.js"></script>
-  <script src="js/auth.js"></script>
+  <script src="js/supabase-config.js?v=3"></script>
+  <script src="js/auth.js?v=3"></script>
 </body>
 </html>

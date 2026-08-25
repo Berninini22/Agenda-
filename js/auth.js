@@ -22,7 +22,12 @@
   const subtitle = document.getElementById("authSubtitle");
   const switchText = document.getElementById("authSwitchText");
   const toggleMode = document.getElementById("toggleMode");
-  let mode = new URLSearchParams(window.location.search).get("mode") === "register" ? "register" : "login";
+  const doctorCallout = document.getElementById("doctorCallout");
+  const doctorCalloutText = document.getElementById("doctorCalloutText");
+  const doctorRegisterLink = document.getElementById("doctorRegisterLink");
+  const searchParams = new URLSearchParams(window.location.search);
+  const switchAccountIntent = searchParams.get("switch") === "1";
+  let mode = searchParams.get("mode") === "register" ? "register" : "login";
 
   function setMessage(text, isSuccess) {
     message.textContent = text || "";
@@ -55,6 +60,9 @@
     submitButton.textContent = registering ? "Criar conta" : "Entrar";
     switchText.firstChild.textContent = registering ? "Já tem uma conta? " : "Ainda não tem uma conta? ";
     toggleMode.textContent = registering ? "Entrar" : "Criar conta";
+    doctorCallout.hidden = false;
+    doctorCalloutText.innerHTML = registering ? "<strong>Atende como médico?</strong> Use o cadastro profissional abaixo." : "<strong>É médico?</strong> Crie seu acesso profissional.";
+    doctorRegisterLink.textContent = registering ? "Selecionar perfil médico" : "Sou médico";
     setMessage("");
     renderRole();
   }
@@ -72,6 +80,18 @@
   });
 
   roleInputs.forEach((input) => input.addEventListener("change", renderRole));
+
+  doctorRegisterLink.addEventListener("click", function () {
+    if (mode === "register") {
+      const doctorInput = roleInputs.find((input) => input.value === "doctor");
+      doctorInput.checked = true;
+      renderRole();
+      doctorFields.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      crmInput.focus();
+      return;
+    }
+    window.location.replace("auth.html?mode=register&switch=1");
+  });
 
   form.addEventListener("submit", async function (event) {
     event.preventDefault();
@@ -132,8 +152,14 @@
     }
   });
 
-  supabase.auth.getSession().then(function ({ data }) {
-    if (data.session) redirectByRole(data.session.user);
+  supabase.auth.getSession().then(async function ({ data }) {
+    if (!data.session) return;
+    if (switchAccountIntent) {
+      await supabase.auth.signOut();
+      setMessage("Sessão anterior encerrada. Agora você pode criar seu acesso profissional.", true);
+      return;
+    }
+    redirectByRole(data.session.user);
   });
 
   renderMode();

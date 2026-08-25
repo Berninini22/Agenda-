@@ -6,7 +6,7 @@ Sistema web de agendamento de consultas com cadastro, login e áreas diferentes 
 
 O projeto funciona como site estático no GitHub Pages. A autenticação, os perfis, a agenda e o armazenamento das fotos são feitos pelo Supabase, enquanto HTML, CSS e JavaScript ficam publicados no GitHub.
 
-No repositório, configure o Pages em **Settings > Pages > Build and deployment > Deploy from a branch**, escolha a branch `index` e a pasta `/ (root)`. O arquivo de entrada é `index.html` na raiz. A tela de login e cadastro fica em `auth.html`; a área profissional fica em `doctor.html`.
+No repositório, configure o Pages em **Settings > Pages > Build and deployment > Deploy from a branch**, escolha a branch `index` e a pasta `/ (root)`. A entrada pública agora é `home.html`; a tela de login e cadastro fica em `auth.html`; a área profissional fica em `doctor.html`.
 
 ## Configuração do Supabase
 
@@ -25,7 +25,7 @@ Se a confirmação de e-mail estiver habilitada no projeto Supabase, o usuário 
 
 ## Fluxos disponíveis
 
-Na tela `auth.html`, o usuário pode alternar entre entrar e criar conta. Ao criar conta, escolhe **Sou paciente** ou **Sou médico**. O cadastro médico exige nome completo, número do CRM, UF do CRM e especialidade, além de aceitar telefone profissional opcional.
+Na página pública `home.html`, o visitante pode escolher entre entrar e criar conta sem ser redirecionado por uma verificação de sessão. Na tela `auth.html`, o usuário pode alternar entre entrar e criar conta. O botão **Sou médico** aparece tanto no login quanto no cadastro: no login ele abre a criação de conta e, no cadastro, seleciona diretamente o perfil médico. O cadastro médico exige nome completo, número do CRM, UF do CRM e especialidade, além de aceitar telefone profissional opcional.
 
 Pacientes continuam usando `index.html` para escolher especialidade, profissional, data, horário e local. Médicos autenticados são encaminhados automaticamente para `doctor.html`, sem passar pela área de agendamento de pacientes.
 
@@ -50,7 +50,7 @@ No painel médico, o profissional pode visualizar a quantidade de consultas do d
 
 ## Endereços
 
-Na publicação final, abra `https://berninini22.github.io/Agenda-/auth.html` para entrar ou criar uma conta. Médicos também podem iniciar o cadastro pelo link **Sou médico** no cabeçalho da área do paciente. Depois do login, o sistema encaminha cada papel para sua respectiva área.
+Na publicação final, abra `https://berninini22.github.io/Agenda-/home.html` para acessar a entrada pública. A partir dela, use **Entrar**, **Criar conta** ou **Sou médico**. Depois do login, o sistema encaminha cada papel para sua respectiva área.
 
 ## Desenvolvimento local
 
