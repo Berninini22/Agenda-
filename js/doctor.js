@@ -287,11 +287,6 @@
       input.closest(".availability-row").classList.toggle("is-disabled", !input.checked);
       updateAvailabilityCount();
     }));
-    $("#a11yToggle").addEventListener("click", () => {
-      const active = document.body.classList.toggle("a11y-mode");
-      $("#a11yToggle").setAttribute("aria-pressed", String(active));
-      showToast(active ? "Modo acessível ativado" : "Modo acessível desativado");
-    });
     $("#logoutButton").addEventListener("click", async () => {
       await supabaseClient.auth.signOut();
       window.location.replace("auth.html");

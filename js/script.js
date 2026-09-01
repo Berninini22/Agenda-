@@ -484,15 +484,7 @@
     });
   }
 
-  /* ===================================================
-     Modo acessível (texto maior + contraste reforçado)
-     =================================================== */
-  const a11yToggle = document.getElementById("a11yToggle");
-  a11yToggle.addEventListener("click", () => {
-    const active = document.body.classList.toggle("a11y-mode");
-    a11yToggle.setAttribute("aria-pressed", String(active));
-    showToast(active ? "Modo acessível ativado" : "Modo acessível desativado");
-  });
+  
 
   /* ===================================================
      Menu mobile

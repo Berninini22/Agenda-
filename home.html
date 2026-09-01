@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=3">
+  <link rel="stylesheet" href="css/style.css?v=4">
 </head>
 <body class="public-page">
   <a class="skip-link" href="#public-content">Pular para o conteúdo</a>
@@ -20,6 +20,10 @@
       </a>
       <nav class="public-nav" aria-label="Navegação pública">
         <a href="#como-funciona">Como funciona</a>
+        <button type="button" class="a11y-toggle" id="a11yToggle" aria-pressed="false">
+          <span class="a11y-icon" aria-hidden="true">Aa</span>
+          <span>Modo acessível</span>
+        </button>
         <a href="auth.html">Entrar</a>
         <a class="btn btn-primary btn-small" href="auth.html?mode=register">Criar conta</a>
       </nav>
@@ -72,5 +76,7 @@
       <div class="footer-col"><h4>Profissionais</h4><p><a href="auth.html?mode=register">Cadastro médico</a><br><a href="auth.html">Área de login</a></p></div>
     </div>
   </footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="js/accessibility.js?v=2"></script>
 </body>
 </html>
