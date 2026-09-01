@@ -5,11 +5,11 @@
      Dados mockados (simulam um back-end)
      =================================================== */
   const SPECIALTIES = [
-    { id: "clinico", name: "Clínico Geral", icon: "🩺", meta: "Avaliação geral" },
-    { id: "cardio", name: "Cardiologia", icon: "❤️", meta: "Coração e circulação" },
-    { id: "pediatria", name: "Pediatria", icon: "🧒", meta: "Crianças e adolescentes" },
-    { id: "dermato", name: "Dermatologia", icon: "🌿", meta: "Pele, cabelo e unhas" },
-    { id: "ortopedia", name: "Ortopedia", icon: "🦴", meta: "Ossos e articulações" }
+{ id: "clinico", name: "Clínico Geral", icon: "🩺", meta: "Cuida da saúde em geral", help: "Para avaliar sintomas e orientar os próximos cuidados." },
+    { id: "cardio", name: "Cardiologia", icon: "❤️", meta: "Cuida do coração", help: "Para cuidar do coração e da circulação." },
+    { id: "pediatria", name: "Pediatria", icon: "🧒", meta: "Cuida de crianças", help: "Para crianças e adolescentes." },
+    { id: "dermato", name: "Dermatologia", icon: "🌿", meta: "Cuida da pele", help: "Para problemas de pele, cabelo e unhas." },
+    { id: "ortopedia", name: "Ortopedia", icon: "🦴", meta: "Cuida de ossos e juntas", help: "Para dores e problemas nos ossos, músculos e juntas." }
   ];
 
   /* Cada profissional pode atender em mais de uma unidade */
@@ -57,10 +57,17 @@
 
   let appointments = [];
   let doctorDirectory = [];
-  const supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_PUBLISHABLE_KEY);
+  let pendingCancellation = null;
+  const supabaseClient = window.supabase && window.SUPABASE_URL && window.SUPABASE_PUBLISHABLE_KEY
+    ? window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_PUBLISHABLE_KEY)
+    : null;
   let currentUser = null;
 
   async function requireSession() {
+    if (!supabaseClient) {
+      showToast("A agenda está pronta, mas falta configurar a conexão com o Supabase.", "error");
+      return false;
+    }
     const { data, error } = await supabaseClient.auth.getSession();
     if (error || !data.session) {
       window.location.replace("auth.html");
@@ -148,13 +155,68 @@
     return node;
   }
 
-  function showToast(message) {
+  function showToast(message, type = "success") {
     const toast = document.getElementById("toast");
     toast.textContent = message;
+    toast.classList.toggle("is-error", type === "error");
     toast.classList.add("is-visible");
     clearTimeout(showToast._t);
-    showToast._t = setTimeout(() => toast.classList.remove("is-visible"), 2600);
+    showToast._t = setTimeout(() => toast.classList.remove("is-visible"), 3600);
   }
+
+  function friendlyError(error, fallback) {
+    const message = String(error?.message || "").toLowerCase();
+    if (message.includes("permission") || message.includes("row-level") || message.includes("policy")) {
+      return "Você não tem permissão para fazer isso. Entre novamente e tente outra vez.";
+    }
+    if (message.includes("network") || message.includes("fetch") || message.includes("failed")) {
+      return "A internet parece estar instável. Confira sua conexão e tente novamente.";
+    }
+    return fallback;
+  }
+
+  function closeCancellationDialog(restoreFocus = true) {
+    const dialog = document.getElementById("confirmDialog");
+    const previousFocus = pendingCancellation?.button;
+    dialog.hidden = true;
+    document.body.classList.remove("dialog-open");
+    pendingCancellation = null;
+    if (restoreFocus && previousFocus?.isConnected) previousFocus.focus();
+  }
+
+  function openCancellationDialog(appointment, button) {
+    pendingCancellation = { appointment, button };
+    const dialog = document.getElementById("confirmDialog");
+    const text = document.getElementById("confirmDialogText");
+    text.textContent = "Você deseja realmente cancelar a consulta de " + appointment.professional + ", marcada para " + formatFullDate(appointment.dateISO) + " às " + appointment.time + "?";
+    dialog.hidden = false;
+    document.body.classList.add("dialog-open");
+    document.getElementById("confirmDialogProceed").focus();
+  }
+
+  document.getElementById("confirmDialogCancel").addEventListener("click", () => closeCancellationDialog(true));
+  document.querySelector("[data-confirm-close]").addEventListener("click", () => closeCancellationDialog(true));
+  document.getElementById("confirmDialog").addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeCancellationDialog(true);
+  });
+  document.getElementById("confirmDialogProceed").addEventListener("click", async () => {
+    if (!pendingCancellation) return;
+    const { appointment, button } = pendingCancellation;
+    closeCancellationDialog(false);
+    button.disabled = true;
+    button.textContent = "Cancelando...";
+    try {
+      const { error } = await supabaseClient.from("appointments").delete().eq("id", appointment.id).eq("user_id", currentUser.id);
+      if (error) throw error;
+      appointments = appointments.filter((item) => item.id !== appointment.id);
+      renderAppointments();
+      showToast("Pronto! A consulta foi cancelada.");
+    } catch (error) {
+      button.disabled = false;
+      button.textContent = "Cancelar";
+      showToast(friendlyError(error, "Não foi possível cancelar a consulta. Tente novamente."), "error");
+    }
+  });
 
   /* Slots indisponíveis simulados, determinísticos por data */
   function unavailableSlotsFor(iso) {
@@ -177,7 +239,8 @@
       card.innerHTML =
         '<span class="opt-icon">' + sp.icon + '</span>' +
         '<span class="opt-name">' + sp.name + '</span>' +
-        '<span class="opt-meta">' + sp.meta + '</span>';
+        '<span class="opt-meta">' + sp.meta + '</span>' +
+        '<span class="opt-help">' + sp.help + '</span>';
       card.addEventListener("click", () => {
         state.specialtyId = sp.id;
         state.professionalId = null;
@@ -202,7 +265,7 @@
       return;
     }
     const specialty = SPECIALTIES.find((s) => s.id === state.specialtyId);
-    hint.textContent = "Profissionais disponíveis em " + specialty.name + ":";
+    hint.textContent = "Escolha um médico. Especialidade: " + specialty.name + ".";
 
     PROFESSIONALS[state.specialtyId].forEach((pro) => {
       const row = el("button", "professional-row");
@@ -241,6 +304,7 @@
       chip.type = "button";
       chip.setAttribute("role", "radio");
       chip.setAttribute("aria-checked", String(state.dateISO === iso));
+      chip.setAttribute("aria-label", formatFullDate(iso));
       chip.innerHTML = '<span class="dow">' + dow + '</span><span class="dom">' + dom + '</span>';
       chip.addEventListener("click", () => {
         state.dateISO = iso;
@@ -293,7 +357,7 @@
       hint.textContent = "Volte e escolha o profissional primeiro.";
       return;
     }
-    hint.textContent = "Locais em que " + pro.name + " atende:";
+    hint.textContent = "Escolha onde você quer ser atendido por " + pro.name + ".";
 
     pro.units.forEach((unit) => {
       const row = el("button", "professional-row");
@@ -370,10 +434,10 @@
   }
 
   function validateStep(n) {
-    if (n === 1 && !state.specialtyId) return "Escolha uma especialidade para continuar.";
-    if (n === 2 && !state.professionalId) return "Escolha um profissional para continuar.";
-    if (n === 3 && (!state.dateISO || !state.time)) return "Escolha a data e o horário para continuar.";
-    if (n === 4 && !state.locationId) return "Escolha o local de atendimento para continuar.";
+if (n === 1 && !state.specialtyId) return "Escolha o tipo de médico que você precisa.";
+    if (n === 2 && !state.professionalId) return "Escolha um médico para continuar.";
+    if (n === 3 && (!state.dateISO || !state.time)) return "Escolha um dia e um horário disponíveis.";
+    if (n === 4 && !state.locationId) return "Escolha onde você quer ser atendido.";
     return "";
   }
 
@@ -386,8 +450,8 @@
     }
     // step 5: confirmar
     const nameInput = document.getElementById("patientName");
-    if (!nameInput.value.trim()) {
-      setStatus("Digite o nome do paciente para confirmar.");
+if (!nameInput.value.trim()) {
+      setStatus("Digite seu nome completo para confirmar a consulta.");
       nameInput.focus();
       return;
     }
@@ -421,9 +485,9 @@
       });
       if (error) throw error;
       await loadAppointments();
-      showToast("Consulta agendada com " + pro.name + " em " + unit.name + "!");
+      showToast("Pronto! Sua consulta foi marcada com " + pro.name + ".");
     } catch (error) {
-      setStatus(error.message);
+      setStatus("Não foi possível marcar a consulta. Verifique sua internet e tente novamente.");
       return;
     }
 
@@ -464,21 +528,10 @@
         '</div>' +
         '<span class="appt-badge">' + (appt.mode === "teleconsulta" ? "Teleconsulta" : "Presencial") + '</span>';
 
-      const cancelBtn = el("button", "appt-cancel", "Cancelar");
+      const cancelBtn = el("button", "appt-cancel", "Cancelar consulta");
       cancelBtn.type = "button";
-      cancelBtn.addEventListener("click", async () => {
-        cancelBtn.disabled = true;
-        try {
-          const { error } = await supabaseClient.from("appointments").delete().eq("id", appt.id).eq("user_id", currentUser.id);
-          if (error) throw error;
-          appointments = appointments.filter((a) => a.id !== appt.id);
-          renderAppointments();
-          showToast("Consulta cancelada.");
-        } catch (error) {
-          cancelBtn.disabled = false;
-          showToast(error.message);
-        }
-      });
+      cancelBtn.setAttribute("aria-label", "Cancelar consulta de " + appt.professional + " em " + formatFullDate(appt.dateISO));
+      cancelBtn.addEventListener("click", () => openCancellationDialog(appt, cancelBtn));
       card.appendChild(cancelBtn);
       list.appendChild(card);
     });
@@ -506,16 +559,22 @@
      Inicialização
      =================================================== */
   async function init() {
-    if (!(await requireSession())) return;
-    await loadDoctors();
+    // Mostra a primeira etapa imediatamente; a rede não deve deixar a tela vazia.
     renderSpecialties();
     renderAppointments();
+    goToStep(1);
+    if (!(await requireSession())) return;
+    try {
+      await loadDoctors();
+      renderSpecialties();
+    } catch (error) {
+      showToast("Não foi possível carregar médicos cadastrados. Você ainda pode escolher uma opção.", "error");
+    }
     try {
       await loadAppointments();
     } catch (error) {
-      showToast("Não foi possível carregar suas consultas.");
+      showToast("Não foi possível carregar suas consultas. Confira sua internet e tente novamente.", "error");
     }
-    goToStep(1);
   }
 
   document.getElementById("logoutButton").addEventListener("click", async function () {

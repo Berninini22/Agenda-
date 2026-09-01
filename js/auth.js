@@ -32,6 +32,18 @@
   function setMessage(text, isSuccess) {
     message.textContent = text || "";
     message.classList.toggle("is-success", Boolean(isSuccess));
+    message.setAttribute("role", isSuccess ? "status" : "alert");
+  }
+
+  function friendlyAuthError(error) {
+    const code = String(error?.code || "").toLowerCase();
+    const text = String(error?.message || "").toLowerCase();
+    if (code.includes("invalid") || text.includes("invalid login") || text.includes("invalid credentials")) return "E-mail ou senha incorretos. Confira os dados e tente novamente.";
+    if (text.includes("already registered") || text.includes("already exists")) return "Este e-mail já está cadastrado. Clique em Entrar para acessar sua conta.";
+    if (text.includes("email not confirmed")) return "Seu e-mail ainda não foi confirmado. Procure a mensagem de confirmação na sua caixa de entrada.";
+    if (text.includes("password")) return "A senha precisa ter pelo menos 6 caracteres.";
+    if (text.includes("network") || text.includes("fetch") || text.includes("failed")) return "A internet parece estar instável. Confira sua conexão e tente novamente.";
+    return "Não foi possível concluir. Confira os dados e tente novamente.";
   }
 
   function selectedRole() {
@@ -102,13 +114,13 @@
     try {
       const email = emailInput.value.trim();
       const password = passwordInput.value;
-      if (!email || !emailInput.checkValidity()) throw new Error("Digite um e-mail válido.");
+      if (!email || !emailInput.checkValidity()) throw new Error("Digite um e-mail válido, como nome@exemplo.com.");
       if (password.length < 6) throw new Error("A senha precisa ter pelo menos 6 caracteres.");
 
       if (mode === "register") {
         const name = nameInput.value.trim();
         const role = selectedRole();
-        if (!name) throw new Error("Digite seu nome completo.");
+        if (!name) throw new Error("Digite seu nome completo para continuar.");
 
         const metadata = {
           full_name: name,
@@ -120,7 +132,7 @@
           const crm = crmInput.value.trim();
           const crmState = crmStateInput.value;
           const specialty = specialtyInput.value;
-          if (!crm || !crmState || !specialty) throw new Error("Preencha CRM, UF e especialidade para continuar.");
+          if (!crm || !crmState || !specialty) throw new Error("Para continuar, preencha CRM, estado do CRM e especialidade.");
           metadata.crm = crm;
           metadata.crm_state = crmState;
           metadata.specialty = specialty;
@@ -145,7 +157,7 @@
         redirectByRole(data.user);
       }
     } catch (error) {
-      setMessage(error.message || "Não foi possível concluir a operação.");
+      setMessage(friendlyAuthError(error));
     } finally {
       submitButton.disabled = false;
       submitButton.textContent = mode === "register" ? "Criar conta" : "Entrar";

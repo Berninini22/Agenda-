@@ -27,12 +27,13 @@
 
   const $ = (selector) => document.querySelector(selector);
 
-  function showToast(text) {
+  function showToast(text, type = "success") {
     const toast = $("#toast");
     toast.textContent = text;
+    toast.classList.toggle("is-error", type === "error");
     toast.classList.add("is-visible");
     clearTimeout(showToast.timer);
-    showToast.timer = setTimeout(() => toast.classList.remove("is-visible"), 2800);
+    showToast.timer = setTimeout(() => toast.classList.remove("is-visible"), 3600);
   }
 
   function escapeHTML(value) {
@@ -224,22 +225,22 @@
     const button = $("#saveAvailability");
     const availability = readFormAvailability();
     if (Object.values(availability).some((day) => day.enabled && day.start >= day.end)) {
-      showToast("Confira os horários: o início deve ser antes do fim.");
+      showToast("Confira os horários. A hora de início precisa ser antes da hora de fim.", "error");
       return;
     }
     button.disabled = true;
-    button.textContent = "Salvando...";
+    button.textContent = "Salvando seus horários...";
     try {
       const { data, error } = await supabaseClient.from("profiles").update({ availability }).eq("user_id", currentUser.id).select().single();
       if (error) throw error;
       profile = data || { ...profile, availability };
       updateAvailabilityCount();
-      showToast("Horários salvos com sucesso.");
+      showToast("Pronto! Seus horários foram salvos.");
     } catch (error) {
-      showToast(error.message || "Não foi possível salvar os horários.");
+      showToast("Não foi possível salvar seus horários. Confira sua internet e tente novamente.", "error");
     } finally {
       button.disabled = false;
-      button.textContent = "Salvar horários";
+      button.textContent = "Salvar meus horários";
     }
   }
 
@@ -247,11 +248,11 @@
     const file = event.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      showToast("Escolha uma imagem JPG, PNG ou WebP.");
+      showToast("Escolha uma foto JPG, PNG ou WebP.", "error");
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      showToast("A foto precisa ter no máximo 5 MB.");
+      showToast("A foto é muito grande. Escolha uma imagem com até 5 MB.", "error");
       return;
     }
     const extension = file.name.split(".").pop().toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
@@ -264,9 +265,9 @@
       if (profileError) throw profileError;
       profile.avatar_url = data.publicUrl;
       renderProfile();
-      showToast("Foto de perfil atualizada.");
+      showToast("Pronto! Sua foto foi atualizada.");
     } catch (error) {
-      showToast(error.message || "Não foi possível enviar a foto. Verifique o bucket avatars no Supabase.");
+      showToast("Não foi possível enviar a foto. Confira sua internet e tente novamente.", "error");
     } finally {
       event.target.value = "";
     }
@@ -278,9 +279,9 @@
     $("#refreshAppointments").addEventListener("click", async () => {
       try {
         await loadAppointments();
-        showToast("Agenda atualizada.");
+        showToast("Pronto! Suas consultas foram atualizadas.");
       } catch (error) {
-        showToast(error.message || "Não foi possível atualizar a agenda.");
+        showToast("Não foi possível atualizar as consultas. Confira sua internet e tente novamente.", "error");
       }
     });
     document.querySelectorAll('.availability-row input[type="checkbox"]').forEach((input) => input.addEventListener("change", () => {
@@ -318,7 +319,7 @@
       setupEvents();
       await loadAppointments();
     } catch (error) {
-      showToast(error.message || "Execute o SQL atualizado do Agenda+ no Supabase para ativar o painel médico.");
+      showToast("Não foi possível abrir sua agenda. Confira a internet e verifique se o banco foi configurado no Supabase.", "error");
     }
   }
 

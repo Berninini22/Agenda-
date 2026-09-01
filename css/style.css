@@ -1117,3 +1117,46 @@ body.a11y-mode .auth-doctor-callout .link-button{ min-height: 44px; padding: 8px
   .a11y-toggle{ max-width: 100%; }
   body.a11y-mode .a11y-toggle{ min-height: 54px; }
 }
+
+/* =========================================================
+   Acessibilidade avançada — linguagem, segurança e orientação
+   ========================================================= */
+.plain-help{ display: flex; align-items: flex-start; gap: 10px; margin: 14px 0 0; padding: 13px 16px; border-left: 4px solid var(--accent); border-radius: 0 12px 12px 0; background: #e8f8fb; color: var(--text-muted); font-size: .9rem; }
+.plain-help::before{ content: "i"; display: inline-grid; place-items: center; width: 24px; height: 24px; flex: 0 0 auto; border-radius: 50%; background: var(--primary); color: #fff; font-family: var(--font-mono); font-weight: 700; }
+.option-card .opt-help{ color: var(--text-muted); font-size: .75rem; line-height: 1.35; }
+body.a11y-mode .option-card .opt-help{ font-size: .88rem; }
+body.a11y-mode .plain-help{ font-size: 1rem; padding: 16px 18px; border-left-width: 5px; }
+body.a11y-mode .panel-hint{ font-size: 1rem; }
+
+.btn-danger{ border: 2px solid var(--danger); background: var(--danger); color: #fff; box-shadow: 0 6px 16px rgba(184,60,74,.18); }
+.btn-danger:hover{ background: #982d3b; border-color: #982d3b; color: #fff; }
+.toast.is-error{ background: linear-gradient(135deg, #8d2937, var(--danger)); }
+.confirm-dialog[hidden]{ display: none !important; }
+.confirm-dialog{ position: fixed; inset: 0; z-index: 500; display: grid; place-items: center; padding: 20px; }
+.confirm-backdrop{ position: absolute; inset: 0; background: rgba(5,35,50,.68); backdrop-filter: blur(3px); }
+.confirm-card{ position: relative; width: min(100%, 520px); padding: 32px; border: 2px solid #9bcfda; border-radius: 22px; background: #fff; box-shadow: 0 24px 70px rgba(3,40,58,.28); }
+.confirm-icon{ display: inline-grid; place-items: center; width: 48px; height: 48px; margin-bottom: 16px; border-radius: 50%; background: var(--danger-tint); color: var(--danger); font-family: var(--font-display); font-size: 1.7rem; font-weight: 700; }
+.confirm-card h2{ margin-bottom: 10px; color: var(--primary-dark); font-size: clamp(1.55rem, 4vw, 2rem); }
+.confirm-card p{ max-width: 45ch; margin-bottom: 24px; color: var(--text-muted); font-size: 1rem; }
+.confirm-actions{ display: flex; justify-content: flex-end; gap: 12px; flex-wrap: wrap; }
+.confirm-actions .btn{ min-width: 150px; }
+body.dialog-open{ overflow: hidden; }
+body.a11y-mode .confirm-card{ width: min(100%, 580px); padding: 38px; border-width: 3px; }
+body.a11y-mode .confirm-card p{ font-size: 1.12rem; line-height: 1.65; }
+body.a11y-mode .confirm-actions{ justify-content: stretch; }
+body.a11y-mode .confirm-actions .btn{ flex: 1 1 210px; min-height: 60px; }
+@media (max-width: 560px){
+  .confirm-card{ padding: 24px; }
+  .confirm-actions{ flex-direction: column-reverse; }
+  .confirm-actions .btn{ width: 100%; }
+  body.a11y-mode .confirm-card{ padding: 26px 20px; }
+}
+
+/* Feedbacks acessíveis: a pessoa sempre entende o resultado da ação */
+.booking-status{ max-width: 46ch; padding: 8px 12px; border-radius: 9px; }
+.booking-status:not(:empty){ background: var(--danger-tint); color: #7f2431; }
+.auth-error{ border-width: 2px; font-weight: 600; }
+.auth-error.is-success{ border-color: #75bca0; background: #e9f8f0; color: #155d43; }
+body.a11y-mode .booking-status:not(:empty){ font-size: 1rem; padding: 12px 14px; }
+body.a11y-mode .auth-error{ font-size: 1rem; line-height: 1.5; }
+body.a11y-mode .confirm-icon{ width: 56px; height: 56px; }
