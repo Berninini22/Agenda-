@@ -15,6 +15,7 @@
   }
 
   function updateControls(active) {
+    document.documentElement.classList.toggle("a11y-mode", active);
     document.body.classList.toggle("a11y-mode", active);
     buttons.forEach((button) => {
       button.setAttribute("aria-pressed", String(active));

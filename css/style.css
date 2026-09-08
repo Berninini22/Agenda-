@@ -36,6 +36,18 @@
 }
 
 /* Modo acessível — leitura confortável e navegação para todas as idades */
+/* Escala aplicada na raiz (html): todo o site usa unidades rem/em relativas
+   à raiz, então aumentar aqui garante que TODO texto e botão cresça de forma
+   proporcional (títulos continuam maiores que textos de apoio, botões
+   continuam maiores que rótulos), sem quebrar o layout responsivo. */
+html.a11y-mode{
+  font-size: 120%;
+}
+@media (max-width: 480px){
+  /* em telas pequenas, um aumento um pouco mais contido evita que
+     textos e botões quebrem o layout ou estourem a largura da tela */
+  html.a11y-mode{ font-size: 114%; }
+}
 body.a11y-mode{
   --bg: #F8FCFD;
   --surface: #FFFFFF;
@@ -45,7 +57,6 @@ body.a11y-mode{
   --text-muted: #294B5B;
   --border: #8EBCC9;
   --focus-ring: 0 0 0 4px rgba(24, 184, 201, 0.45), 0 0 0 8px rgba(6, 75, 104, 0.24);
-  font-size: 121%;
 }
 body.a11y-mode *{ letter-spacing: 0.012em; }
 body.a11y-mode p,
@@ -168,6 +179,36 @@ ul, ol{ margin: 0; padding: 0; list-style: none; }
 }
 .btn:disabled:hover{ background: transparent; }
 .btn-primary:disabled:hover{ background: var(--accent); }
+
+/* Botões de texto (ex.: "Criar conta", "Sou médico", "Atualizar consultas")
+   — antes sem nenhum estilo (apareciam como botão padrão do navegador).
+   Agora seguem a mesma identidade visual do restante do site. */
+.link-button{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--accent-dark);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.92rem;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, text-decoration-color .15s ease;
+}
+.link-button:hover{
+  background: var(--primary-tint);
+  color: var(--primary-dark);
+  text-decoration-color: currentColor;
+}
+.link-button:active{ transform: translateY(1px); }
 
 /* =========================================================
    Header
@@ -731,6 +772,19 @@ ul, ol{ margin: 0; padding: 0; list-style: none; }
 }
 
 /* =========================================================
+   Formato da consulta e unidade
+   ========================================================= */
+.location-choice[hidden]{ display:none; }
+.subpanel-title{ margin: 26px 0 6px; color: var(--primary-dark); font-size: 1rem; }
+.mode-list{ margin-bottom: 4px; }
+.mode-row{ border-color: #a8dce4; background: linear-gradient(135deg, #f7fdfe, #eefafd); }
+.mode-row .pro-avatar{ background: #d8f6f8; font-size: 1.35rem; }
+.mode-row[aria-checked="true"]{ border-color: var(--primary); background: #e3f9fa; box-shadow: 0 0 0 3px rgba(24,184,201,.14); }
+.mode-row[aria-checked="true"] .pro-avatar{ background: var(--primary); }
+body.a11y-mode .subpanel-title{ font-size: 1.15rem; }
+body.a11y-mode .mode-row{ min-height: 78px; }
+
+/* =========================================================
    Responsive
    ========================================================= */
 @media (max-width: 860px){
@@ -1103,6 +1157,7 @@ body.a11y-mode .option-card[aria-checked="true"], body.a11y-mode .professional-r
 body.a11y-mode .a11y-toggle:focus-visible, body.a11y-mode .btn:focus-visible{ outline-offset: 4px; }
 body.a11y-mode .form-note, body.a11y-mode .field-hint, body.a11y-mode .profile-helper{ font-size: .96rem; }
 body.a11y-mode .auth-doctor-callout{ border-width: 2px; }
+body.a11y-mode .link-button{ min-height: 50px; padding: 10px 14px; border-radius: 8px; font-weight: 700; text-decoration-color: currentColor; }
 body.a11y-mode .auth-doctor-callout .link-button{ min-height: 44px; padding: 8px 11px; border-radius: 8px; background: var(--primary-dark); color: #fff; }
 @media (max-width: 720px){
   .auth-utility{ margin-right: 0; }

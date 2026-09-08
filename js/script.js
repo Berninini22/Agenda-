@@ -5,11 +5,15 @@
      Dados mockados (simulam um back-end)
      =================================================== */
   const SPECIALTIES = [
-{ id: "clinico", name: "Clínico Geral", icon: "🩺", meta: "Cuida da saúde em geral", help: "Para avaliar sintomas e orientar os próximos cuidados." },
-    { id: "cardio", name: "Cardiologia", icon: "❤️", meta: "Cuida do coração", help: "Para cuidar do coração e da circulação." },
-    { id: "pediatria", name: "Pediatria", icon: "🧒", meta: "Cuida de crianças", help: "Para crianças e adolescentes." },
-    { id: "dermato", name: "Dermatologia", icon: "🌿", meta: "Cuida da pele", help: "Para problemas de pele, cabelo e unhas." },
-    { id: "ortopedia", name: "Ortopedia", icon: "🦴", meta: "Cuida de ossos e juntas", help: "Para dores e problemas nos ossos, músculos e juntas." }
+    { id: "clinico", name: "Clínico Geral", icon: "🩺", meta: "Cuida da saúde em geral", help: "Para avaliar sintomas e orientar os próximos cuidados.", telehealth: false },
+    { id: "cardio", name: "Cardiologia", icon: "❤️", meta: "Cuida do coração", help: "Para cuidar do coração e da circulação.", telehealth: false },
+    { id: "pediatria", name: "Pediatria", icon: "🧒", meta: "Cuida de crianças", help: "Para crianças e adolescentes.", telehealth: false },
+    { id: "dermato", name: "Dermatologia", icon: "🌿", meta: "Cuida da pele", help: "Para problemas de pele, cabelo e unhas.", telehealth: true },
+    { id: "ortopedia", name: "Ortopedia", icon: "🦴", meta: "Cuida de ossos e juntas", help: "Para dores e problemas nos ossos, músculos e juntas.", telehealth: false },
+    { id: "psicologia", name: "Psicologia", icon: "🧠", meta: "Cuida da saúde emocional", help: "Para conversar sobre emoções, ansiedade e dificuldades do dia a dia.", telehealth: true },
+    { id: "nutricao", name: "Nutrição", icon: "🥗", meta: "Cuida da alimentação", help: "Para organizar a alimentação e cuidar da saúde.", telehealth: true },
+    { id: "ginecologia", name: "Ginecologia", icon: "🌸", meta: "Cuida da saúde da mulher", help: "Para prevenção e cuidados da saúde da mulher.", telehealth: false },
+    { id: "neurologia", name: "Neurologia", icon: "🧠", meta: "Cuida do sistema nervoso", help: "Para avaliar cérebro, nervos, memória e movimentos.", telehealth: false }
   ];
 
   /* Cada profissional pode atender em mais de uma unidade */
@@ -36,7 +40,24 @@
       { id: "p7", name: "Dra. Renata Lima", crm: "CRM 77234-SP", units: [UNITS.sul, UNITS.norte] }
     ],
     ortopedia: [
-      { id: "p8", name: "Dr. André Silveira", crm: "CRM 88345-SP", units: [UNITS.sul, UNITS.centro] }
+      { id: "p8", name: "Dr. André Silveira", crm: "CRM 88345-SP", units: [UNITS.sul, UNITS.centro] },
+      { id: "p9", name: "Dra. Paula Mendes", crm: "CRM 90412-SP", units: [UNITS.centro, UNITS.norte] }
+    ],
+    psicologia: [
+      { id: "p10", name: "Dra. Laura Campos", crm: "CRP 06/18421", units: [UNITS.centro, UNITS.norte] },
+      { id: "p11", name: "Dr. Rafael Moura", crm: "CRP 06/22714", units: [UNITS.sul] }
+    ],
+    nutricao: [
+      { id: "p12", name: "Dra. Marina Lopes", crm: "CRN 3 45821", units: [UNITS.centro, UNITS.sul] },
+      { id: "p13", name: "Dra. Júlia Reis", crm: "CRN 3 50117", units: [UNITS.norte] }
+    ],
+    ginecologia: [
+      { id: "p14", name: "Dra. Fernanda Alves", crm: "CRM 71234-SP", units: [UNITS.centro, UNITS.norte] },
+      { id: "p15", name: "Dra. Patrícia Gomes", crm: "CRM 74518-SP", units: [UNITS.sul] }
+    ],
+    neurologia: [
+      { id: "p16", name: "Dr. Henrique Silva", crm: "CRM 68190-SP", units: [UNITS.centro] },
+      { id: "p17", name: "Dra. Elisa Martins", crm: "CRM 69542-SP", units: [UNITS.norte, UNITS.sul] }
     ]
   };
 
@@ -52,7 +73,8 @@
     professionalId: null,
     dateISO: null,
     time: null,
-    locationId: null
+    locationId: null,
+    mode: null
   };
 
   let appointments = [];
@@ -284,6 +306,7 @@
       row.addEventListener("click", () => {
         state.professionalId = pro.id;
         state.locationId = null;
+        state.mode = null;
         renderProfessionals();
         setStatus("");
       });
@@ -357,7 +380,7 @@
       hint.textContent = "Volte e escolha o profissional primeiro.";
       return;
     }
-    hint.textContent = "Escolha onde você quer ser atendido por " + pro.name + ".";
+    hint.textContent = "Escolha uma unidade onde " + pro.name + " atende.";
 
     pro.units.forEach((unit) => {
       const row = el("button", "professional-row");
@@ -380,6 +403,60 @@
   }
 
   /* ===================================================
+     Renderização — Passo 4: formato e local
+     =================================================== */
+  function renderModes() {
+    const list = document.getElementById("modeOptions");
+    const locationChoice = document.getElementById("locationChoice");
+    const modeHint = document.getElementById("modeHint");
+    const specialty = SPECIALTIES.find((s) => s.id === state.specialtyId);
+    list.innerHTML = "";
+    if (!specialty) {
+      modeHint.textContent = "Volte e escolha uma especialidade primeiro.";
+      locationChoice.hidden = true;
+      return;
+    }
+
+    const modes = [{
+      id: "presencial",
+      icon: "📍",
+      name: "Presencial",
+      help: "Você irá até uma unidade de atendimento."
+    }];
+    if (specialty.telehealth) {
+      modes.push({
+        id: "teleconsulta",
+        icon: "💻",
+        name: "Por vídeo",
+        help: "Você conversa com o profissional pela internet."
+      });
+    }
+
+    modeHint.textContent = specialty.telehealth
+      ? "Para esta especialidade, você pode escolher uma unidade ou conversar por vídeo."
+      : "Esta especialidade precisa de atendimento presencial em uma unidade.";
+
+    modes.forEach((mode) => {
+      const row = el("button", "professional-row mode-row");
+      row.type = "button";
+      row.setAttribute("role", "radio");
+      row.setAttribute("aria-checked", String(state.mode === mode.id));
+      row.innerHTML = '<span class="pro-avatar" aria-hidden="true">' + mode.icon + '</span>' +
+        '<span class="pro-info"><span class="pro-name">' + mode.name + '</span><br>' +
+        '<span class="pro-meta">' + mode.help + '</span></span>';
+      row.addEventListener("click", () => {
+        state.mode = mode.id;
+        state.locationId = mode.id === "teleconsulta" ? "online" : null;
+        renderModes();
+      });
+      list.appendChild(row);
+    });
+
+    locationChoice.hidden = state.mode !== "presencial";
+    if (state.mode === "presencial") renderLocations();
+  }
+
+  /* ===================================================
      Renderização — Passo 5: Confirmação
      =================================================== */
   function renderSummary() {
@@ -387,13 +464,17 @@
     const specialty = SPECIALTIES.find((s) => s.id === state.specialtyId);
     const pro = specialty ? PROFESSIONALS[specialty.id].find((p) => p.id === state.professionalId) : null;
     const unit = pro ? pro.units.find((u) => u.id === state.locationId) : null;
+    const locationText = state.mode === "teleconsulta"
+      ? "Por vídeo — o link será enviado após a confirmação"
+      : (unit ? unit.name + " — " + unit.address : "—");
 
     card.innerHTML =
       row("Especialidade", specialty ? specialty.name : "—") +
       row("Profissional", pro ? pro.name : "—") +
       row("Data", state.dateISO ? formatFullDate(state.dateISO) : "—") +
       row("Horário", state.time || "—") +
-      row("Local", unit ? unit.name + " — " + unit.address : "—");
+      row("Formato", state.mode === "teleconsulta" ? "Por vídeo" : "Presencial") +
+      row("Local", locationText);
 
     function row(label, value) {
       return '<div class="sum-row"><span class="sum-label">' + label + '</span><span class="sum-value">' + value + '</span></div>';
@@ -426,7 +507,7 @@
 
     if (n === 2) renderProfessionals();
     if (n === 3) { renderDates(); renderTimes(); }
-    if (n === 4) renderLocations();
+    if (n === 4) renderModes();
     if (n === 5) renderSummary();
 
     setStatus("");
@@ -437,7 +518,8 @@
 if (n === 1 && !state.specialtyId) return "Escolha o tipo de médico que você precisa.";
     if (n === 2 && !state.professionalId) return "Escolha um médico para continuar.";
     if (n === 3 && (!state.dateISO || !state.time)) return "Escolha um dia e um horário disponíveis.";
-    if (n === 4 && !state.locationId) return "Escolha onde você quer ser atendido.";
+    if (n === 4 && !state.mode) return "Escolha se a consulta será presencial ou por vídeo.";
+    if (n === 4 && state.mode === "presencial" && !state.locationId) return "Escolha uma unidade para ser atendido.";
     return "";
   }
 
@@ -455,7 +537,7 @@ if (!nameInput.value.trim()) {
       nameInput.focus();
       return;
     }
-    confirmAppointment(nameInput.value.trim(), document.getElementById("patientMode").value);
+    confirmAppointment(nameInput.value.trim(), state.mode);
   });
 
   btnBack.addEventListener("click", () => {
@@ -469,7 +551,14 @@ if (!nameInput.value.trim()) {
 
     const specialty = SPECIALTIES.find((s) => s.id === state.specialtyId);
     const pro = PROFESSIONALS[state.specialtyId].find((p) => p.id === state.professionalId);
-    const unit = pro.units.find((u) => u.id === state.locationId);
+    const unit = mode === "teleconsulta"
+      ? { name: "Atendimento por vídeo" }
+      : pro.units.find((u) => u.id === state.locationId);
+
+    if (!unit) {
+      setStatus("Escolha uma unidade antes de confirmar a consulta.");
+      return;
+    }
 
     try {
       const { error } = await supabaseClient.from("appointments").insert({
@@ -497,6 +586,7 @@ if (!nameInput.value.trim()) {
     state.dateISO = null;
     state.time = null;
     state.locationId = null;
+    state.mode = null;
     document.getElementById("patientName").value = "";
     renderSpecialties();
     goToStep(1);
