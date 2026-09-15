@@ -55,3 +55,9 @@ Na publicação final, abra `https://berninini22.github.io/Agenda-/home.html` pa
 ## Desenvolvimento local
 
 Como o projeto é estático, ele pode ser testado com qualquer servidor HTTP local. Na raiz do projeto, execute `python3 -m http.server 8000` e abra `http://localhost:8000/auth.html`. Não abra os arquivos com duplo clique, pois o navegador pode bloquear requisições do Supabase em `file://`.
+
+## Acessibilidade em Libras (VLibras)
+
+Todas as telas principais carregam o **VLibras Widget**, solução oficial do Governo Digital para tradução de conteúdo em Português para Libras. O widget é carregado pelo script público `https://vlibras.gov.br/app/vlibras-plugin.js`, sem token ou chave secreta no frontend, e exibe o botão flutuante do tradutor após o carregamento da página. O modo confortável do Agenda+ continua separado: ele aumenta legibilidade, contraste e área de toque.
+
+A integração é um recurso de acessibilidade visual e linguística; ela não consulta dados governamentais nem substitui uma API REST de cadastro, identidade ou validação. Para usar uma API governamental de dados, seria necessário definir qual serviço oficial e quais dados o sistema precisa trocar.

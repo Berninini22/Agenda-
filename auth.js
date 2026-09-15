@@ -1,0 +1,178 @@
+(() => {
+  "use strict";
+
+  const { createClient } = window.supabase;
+  const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_PUBLISHABLE_KEY);
+  const form = document.getElementById("authForm");
+  const nameField = document.getElementById("nameField");
+  const nameInput = document.getElementById("name");
+  const roleField = document.getElementById("roleField");
+  const roleInputs = [...document.querySelectorAll('input[name="role"]')];
+  const patientRoleOption = document.getElementById("patientRoleOption");
+  const doctorRoleOption = document.getElementById("doctorRoleOption");
+  const doctorFields = document.getElementById("doctorFields");
+  const crmInput = document.getElementById("crm");
+  const crmStateInput = document.getElementById("crmState");
+  const specialtyInput = document.getElementById("specialty");
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+  const submitButton = document.getElementById("authSubmit");
+  const message = document.getElementById("authMessage");
+  const title = document.getElementById("authTitle");
+  const subtitle = document.getElementById("authSubtitle");
+  const switchText = document.getElementById("authSwitchText");
+  const toggleMode = document.getElementById("toggleMode");
+  const doctorCallout = document.getElementById("doctorCallout");
+  const doctorCalloutText = document.getElementById("doctorCalloutText");
+  const doctorRegisterLink = document.getElementById("doctorRegisterLink");
+  const searchParams = new URLSearchParams(window.location.search);
+  const switchAccountIntent = searchParams.get("switch") === "1";
+  let mode = searchParams.get("mode") === "register" ? "register" : "login";
+
+  function setMessage(text, isSuccess) {
+    message.textContent = text || "";
+    message.classList.toggle("is-success", Boolean(isSuccess));
+    message.setAttribute("role", isSuccess ? "status" : "alert");
+  }
+
+  function friendlyAuthError(error) {
+    const code = String(error?.code || "").toLowerCase();
+    const text = String(error?.message || "").toLowerCase();
+    if (code.includes("invalid") || text.includes("invalid login") || text.includes("invalid credentials")) return "E-mail ou senha incorretos. Confira os dados e tente novamente.";
+    if (text.includes("already registered") || text.includes("already exists")) return "Este e-mail já está cadastrado. Clique em Entrar para acessar sua conta.";
+    if (text.includes("email not confirmed")) return "Seu e-mail ainda não foi confirmado. Procure a mensagem de confirmação na sua caixa de entrada.";
+    if (text.includes("password")) return "A senha precisa ter pelo menos 6 caracteres.";
+    if (text.includes("network") || text.includes("fetch") || text.includes("failed")) return "A internet parece estar instável. Confira sua conexão e tente novamente.";
+    return "Não foi possível concluir. Confira os dados e tente novamente.";
+  }
+
+  function selectedRole() {
+    return roleInputs.find((input) => input.checked)?.value || "patient";
+  }
+
+  function renderRole() {
+    const isDoctor = selectedRole() === "doctor";
+    doctorFields.hidden = !isDoctor;
+    doctorFields.setAttribute("aria-hidden", String(!isDoctor));
+    doctorRoleOption.classList.toggle("is-selected", isDoctor);
+    patientRoleOption.classList.toggle("is-selected", !isDoctor);
+    crmInput.required = isDoctor;
+    crmStateInput.required = isDoctor;
+    specialtyInput.required = isDoctor;
+  }
+
+  function renderMode() {
+    const registering = mode === "register";
+    nameField.hidden = !registering;
+    roleField.hidden = !registering;
+    nameInput.required = registering;
+    passwordInput.autocomplete = registering ? "new-password" : "current-password";
+    title.textContent = registering ? "Criar sua conta" : "Entrar no Agenda+";
+    subtitle.textContent = registering ? "Escolha seu perfil e comece a usar o Agenda+." : "Acesse sua conta para agendar e acompanhar suas consultas.";
+    submitButton.textContent = registering ? "Criar conta" : "Entrar";
+    switchText.firstChild.textContent = registering ? "Já tem uma conta? " : "Ainda não tem uma conta? ";
+    toggleMode.textContent = registering ? "Entrar" : "Criar conta";
+    doctorCallout.hidden = false;
+    doctorCalloutText.innerHTML = registering ? "<strong>Atende como médico?</strong> Use o cadastro profissional abaixo." : "<strong>É médico?</strong> Crie seu acesso profissional.";
+    doctorRegisterLink.textContent = registering ? "Selecionar perfil médico" : "Sou médico";
+    setMessage("");
+    renderRole();
+  }
+
+  function redirectByRole(user) {
+    const role = user?.user_metadata?.role;
+    window.location.replace(role === "doctor" ? "doctor.html" : "index.html");
+  }
+
+  toggleMode.addEventListener("click", function () {
+    mode = mode === "login" ? "register" : "login";
+    window.history.replaceState({}, "", "auth.html" + (mode === "register" ? "?mode=register" : ""));
+    form.reset();
+    renderMode();
+  });
+
+  roleInputs.forEach((input) => input.addEventListener("change", renderRole));
+
+  doctorRegisterLink.addEventListener("click", function () {
+    if (mode === "register") {
+      const doctorInput = roleInputs.find((input) => input.value === "doctor");
+      doctorInput.checked = true;
+      renderRole();
+      doctorFields.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      crmInput.focus();
+      return;
+    }
+    window.location.replace("auth.html?mode=register&switch=1");
+  });
+
+  form.addEventListener("submit", async function (event) {
+    event.preventDefault();
+    setMessage("");
+    submitButton.disabled = true;
+    submitButton.textContent = mode === "register" ? "Criando conta..." : "Entrando...";
+
+    try {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      if (!email || !emailInput.checkValidity()) throw new Error("Digite um e-mail válido, como nome@exemplo.com.");
+      if (password.length < 6) throw new Error("A senha precisa ter pelo menos 6 caracteres.");
+
+      if (mode === "register") {
+        const name = nameInput.value.trim();
+        const role = selectedRole();
+        if (!name) throw new Error("Digite seu nome completo para continuar.");
+
+        const metadata = {
+          full_name: name,
+          role,
+          phone: document.getElementById("phone").value.trim()
+        };
+
+        if (role === "doctor") {
+          const crm = crmInput.value.trim();
+          const crmState = crmStateInput.value;
+          const specialty = specialtyInput.value;
+          if (!crm || !crmState || !specialty) throw new Error("Para continuar, preencha CRM, estado do CRM e especialidade.");
+          metadata.crm = crm;
+          metadata.crm_state = crmState;
+          metadata.specialty = specialty;
+        }
+
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { data: metadata }
+        });
+        if (error) throw error;
+        if (!data.session) {
+          setMessage("Conta criada. Verifique seu e-mail para confirmar o cadastro.", true);
+          form.reset();
+          renderRole();
+        } else {
+          redirectByRole(data.user);
+        }
+      } else {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        redirectByRole(data.user);
+      }
+    } catch (error) {
+      setMessage(friendlyAuthError(error));
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = mode === "register" ? "Criar conta" : "Entrar";
+    }
+  });
+
+  supabase.auth.getSession().then(async function ({ data }) {
+    if (!data.session) return;
+    if (switchAccountIntent) {
+      await supabase.auth.signOut();
+      setMessage("Sessão anterior encerrada. Agora você pode criar seu acesso profissional.", true);
+      return;
+    }
+    redirectByRole(data.session.user);
+  });
+
+  renderMode();
+})();
