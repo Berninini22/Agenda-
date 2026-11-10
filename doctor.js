@@ -201,13 +201,21 @@
 
     const list = $("#doctorAppointmentsList");
     const empty = $("#doctorEmptyState");
+    const selectedDay = $("#appointmentDayFilter")?.value || "all";
+    const selectedPeriod = $("#appointmentPeriodFilter")?.value || "all";
+    const visibleAppointments = upcoming.filter((appointment) => {
+      const weekday = new Date(`${appointment.date_iso}T00:00:00`).getDay();
+      const morning = String(appointment.time).slice(0, 5) < "12:00";
+      return (selectedDay === "all" || String(weekday) === selectedDay) &&
+        (selectedPeriod === "all" || (selectedPeriod === "morning" ? morning : !morning));
+    });
     list.innerHTML = "";
-    if (upcoming.length === 0) {
+    if (visibleAppointments.length === 0) {
       empty.classList.remove("is-hidden");
       return;
     }
     empty.classList.add("is-hidden");
-    upcoming.forEach((appointment) => {
+    visibleAppointments.forEach((appointment) => {
       const article = document.createElement("article");
       article.className = "doctor-appointment-row";
       const date = new Date(`${appointment.date_iso}T00:00:00`);
@@ -276,6 +284,8 @@
   function setupEvents() {
     $("#availabilityForm").addEventListener("submit", saveAvailability);
     $("#avatarInput").addEventListener("change", uploadAvatar);
+    $("#appointmentDayFilter").addEventListener("change", renderDashboard);
+    $("#appointmentPeriodFilter").addEventListener("change", renderDashboard);
     $("#refreshAppointments").addEventListener("click", async () => {
       try {
         await loadAppointments();

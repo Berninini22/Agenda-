@@ -33,6 +33,10 @@
           <input id="name" name="name" type="text" autocomplete="name" maxlength="120">
         </div>
 
+        <div class="form-field" id="termsConsent" hidden>
+          <label><input id="acceptTerms" name="acceptTerms" type="checkbox"> Li e aceito os <a href="terms.html" target="_blank" rel="noopener">Termos de Uso completos</a>.</label>
+        </div>
+
         <fieldset class="role-field" id="roleField" hidden>
           <legend>Como você vai usar o Agenda+?</legend>
           <div class="role-options">
@@ -110,7 +114,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js?v=4"></script>
   <script src="js/accessibility.js?v=2"></script>
-  <script src="js/auth.js?v=4"></script>
+  <script src="accessibility-assistant.js?v=1"></script>
+  <script src="js/auth.js?v=5"></script>
   <script src="https://vlibras.gov.br/app/vlibras-plugin.js" defer></script>
 </body>
 </html>

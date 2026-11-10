@@ -97,6 +97,14 @@
                 </div>
                 <button type="button" class="link-button" id="refreshAppointments">Atualizar consultas</button>
               </div>
+              <div class="form-grid-2 appointment-filters">
+                <label for="appointmentDayFilter">Dia da semana
+                  <select id="appointmentDayFilter"><option value="all">Todos os dias</option><option value="1">Segunda-feira</option><option value="2">Terça-feira</option><option value="3">Quarta-feira</option><option value="4">Quinta-feira</option><option value="5">Sexta-feira</option><option value="6">Sábado</option><option value="0">Domingo</option></select>
+                </label>
+                <label for="appointmentPeriodFilter">Período
+                  <select id="appointmentPeriodFilter"><option value="all">Manhã e tarde</option><option value="morning">Manhã</option><option value="afternoon">Tarde</option></select>
+                </label>
+              </div>
               <div class="doctor-appointments-list" id="doctorAppointmentsList"></div>
               <p class="empty-state compact-empty" id="doctorEmptyState">Você ainda não tem consultas marcadas para os próximos dias.</p>
             </article>
@@ -154,6 +162,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js?v=4"></script>
   <script src="js/accessibility.js?v=2"></script>
+  <script src="accessibility-assistant.js?v=1"></script>
   <script src="js/doctor.js?v=5"></script>
   <script src="https://vlibras.gov.br/app/vlibras-plugin.js" defer></script>
 </body>

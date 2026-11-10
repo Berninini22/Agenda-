@@ -61,3 +61,29 @@ Como o projeto é estático, ele pode ser testado com qualquer servidor HTTP loc
 Todas as telas principais carregam o **VLibras Widget**, solução oficial do Governo Digital para tradução de conteúdo em Português para Libras. O widget é carregado pelo script público `https://vlibras.gov.br/app/vlibras-plugin.js`, sem token ou chave secreta no frontend, e exibe o botão flutuante do tradutor após o carregamento da página. O modo confortável do Agenda+ continua separado: ele aumenta legibilidade, contraste e área de toque.
 
 A integração é um recurso de acessibilidade visual e linguística; ela não consulta dados governamentais nem substitui uma API REST de cadastro, identidade ou validação. Para usar uma API governamental de dados, seria necessário definir qual serviço oficial e quais dados o sistema precisa trocar.
+
+## Atualização de funcionalidades (v2)
+
+O cadastro passou a exigir a aceitação dos Termos de Uso e registra a versão no metadado de criação da conta. Para persistir o aceite no perfil, execute `supabase-upgrade.sql` depois do schema principal. O gatilho grava o horário do servidor e impede que clientes alterem o aceite posteriormente. A página pública `terms.html` é acessível pelo resumo em `home.html` e pelo formulário.
+
+A migração `supabase-upgrade.sql` adiciona tabelas normalizadas para locais, associação médico-local, slots semanais por dia/turno, logs de notificações e uma função transacional para impedir reservas concorrentes duplicadas. **O fluxo atualmente publicado ainda usa `profiles.availability` e o cadastro de consultas do frontend; a gestão do painel e o agendamento precisam ser migrados para `doctor_slots`/`book_appointment` antes de ativar essa nova estrutura em produção.** Não execute a migração em produção sem backup e validação dos dados existentes.
+
+O filtro no painel médico consulta os agendamentos carregados e permite filtrar dia da semana e manhã/tarde. O assistente de acessibilidade é um cliente para a Edge Function `supabase/functions/accessibility-assistant/index.ts`; sem implantação e sem `OPENAI_API_KEY`, ele informa indisponibilidade e não inventa respostas.
+
+### Deploy do assistente
+
+1. Configure no projeto Supabase os secrets `OPENAI_API_KEY`, `OPENAI_MODEL` (opcional; padrão `gpt-4o-mini`) e `APP_ORIGIN` (origem do site).
+2. Publique `accessibility-assistant` com Supabase CLI (`supabase functions deploy accessibility-assistant`). A validação JWT permanece habilitada.
+3. Use uma chave de API de servidor em secrets; nunca inclua `service_role` ou chave de provedor nos arquivos HTML/JS.
+
+### VLibras e API governamental
+
+O projeto já carrega o VLibras Widget oficial em páginas principais. O catálogo ConectaGov descreve a suíte VLibras e enumera interfaces para sinais, tradução Português→glosa e geração/consulta de vídeo; não é uma API genérica de cadastro de pessoas ou dados de acessibilidade. Esta versão mantém o widget existente e não invoca os endpoints REST descritos no catálogo. Consulte os links oficiais indicados no relatório de implementação antes de qualquer integração direta, pois disponibilidade, autenticação e contrato técnico devem ser confirmados na documentação atual.
+
+### Notificações externas
+
+A tabela `notification_log` é apenas o modelo de auditoria. Envio de e-mail e WhatsApp não foi conectado: requer um backend/Edge Function, provedor e credenciais aprovadas. Para WhatsApp Cloud API, configure uma conta/app da Meta, número e token de usuário de sistema, permissões, modelos de mensagem quando aplicável e webhook HTTPS. Não colocar tokens no frontend. Nenhum envio foi simulado ou realizado.
+
+### Dados de teste
+
+A base SQLite dentro de `data/agenda.sqlite` pertence à implementação PHP legada e contém apenas um usuário e um agendamento (além das tabelas internas SQLite); não é o banco usado pelo frontend Supabase. A migração inclui quatro locais de demonstração. Não há 20 registros completos coerentemente vinculados a médicos/pacientes, pois isso exige contas Auth válidas e médicos reais/de teste cadastrados. Crie contas de teste no Supabase e associe seus UUIDs a locais/slots antes de apresentar a integração relacional.
