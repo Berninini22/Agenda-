@@ -8,12 +8,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=4">
 </head>
 <body class="auth-page">
   <main class="auth-shell">
     <section class="auth-card" aria-labelledby="authTitle">
-      <a class="auth-brand" href="../pages/auth.html" aria-label="Agenda+ — início">
+      <div class="auth-utility">
+        <button type="button" class="a11y-toggle" id="a11yToggle" aria-pressed="false">
+          <span class="a11y-icon" aria-hidden="true">Aa</span>
+          <span>Modo acessível</span>
+        </button>
+      </div>
+      <a class="auth-brand" href="home.html" aria-label="Agenda+ — início">
         <span class="brand-mark" aria-hidden="true">+</span>
         <span class="brand-name">Agenda<span class="brand-plus">+</span></span>
       </a>
@@ -26,6 +32,65 @@
           <label for="name">Nome completo</label>
           <input id="name" name="name" type="text" autocomplete="name" maxlength="120">
         </div>
+
+        <div class="form-field" id="termsConsent" hidden>
+          <label><input id="acceptTerms" name="acceptTerms" type="checkbox"> Li e aceito os <a href="terms.html" target="_blank" rel="noopener">Termos de Uso completos</a>.</label>
+        </div>
+
+        <fieldset class="role-field" id="roleField" hidden>
+          <legend>Como você vai usar o Agenda+?</legend>
+          <div class="role-options">
+            <label class="role-option is-selected" id="patientRoleOption">
+              <input type="radio" name="role" value="patient" checked>
+              <span class="role-option-copy"><strong>Sou paciente</strong><small>Agendar e acompanhar consultas</small></span>
+            </label>
+            <label class="role-option" id="doctorRoleOption">
+              <input type="radio" name="role" value="doctor">
+              <span class="role-option-copy"><strong>Sou médico</strong><small>Gerenciar minha agenda profissional</small></span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div class="auth-doctor-callout auth-doctor-callout-inline" id="doctorCallout">
+          <span id="doctorCalloutText"><strong>É médico?</strong> Crie seu acesso profissional.</span>
+          <button type="button" class="link-button" id="doctorRegisterLink">Sou médico</button>
+        </div>
+
+        <div class="doctor-fields" id="doctorFields" hidden>
+          <div class="doctor-fields-heading">
+            <span class="section-kicker">Cadastro profissional</span>
+            <p>Essas informações aparecem no seu perfil e ajudam os pacientes a encontrar você.</p>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label for="crm">Número do CRM</label>
+              <input id="crm" name="crm" type="text" autocomplete="off" maxlength="30" placeholder="Ex.: 123456">
+            </div>
+            <div class="form-field">
+              <label for="crmState">UF do CRM</label>
+              <select id="crmState" name="crmState">
+                <option value="">Selecione</option>
+                <option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="specialty">Especialidade principal</label>
+            <select id="specialty" name="specialty">
+              <option value="">Selecione sua especialidade</option>
+              <option>Clínico Geral</option>
+              <option>Cardiologia</option>
+              <option>Pediatria</option>
+              <option>Dermatologia</option>
+              <option>Ortopedia</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="phone">Telefone profissional <span class="optional-label">(opcional)</span></label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel" maxlength="20" placeholder="(14) 99999-9999">
+          </div>
+        </div>
+
         <div class="form-field">
           <label for="email">E-mail</label>
           <input id="email" name="email" type="email" autocomplete="email" required>
@@ -42,11 +107,14 @@
       <p class="auth-switch" id="authSwitchText">Ainda não tem uma conta?
         <button type="button" class="link-button" id="toggleMode">Criar conta</button>
       </p>
-      <a class="auth-back" href="../index.html">Voltar para o início</a>
+      <a class="auth-back" href="home.html">Voltar para o início</a>
     </section>
   </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="../js/supabase-config.js"></script>
-  <script src="../js/auth.js"></script>
+  <script src="js/supabase-config.js?v=4"></script>
+  <script src="js/accessibility.js?v=2"></script>
+  <script src="js/auth.js?v=5"></script>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js" defer></script>
 </body>
 </html>

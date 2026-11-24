@@ -561,7 +561,7 @@ if (!nameInput.value.trim()) {
     }
 
     try {
-      const { error } = await supabaseClient.from("appointments").insert({
+      const { data: bookedAppointment, error } = await supabaseClient.from("appointments").insert({
         user_id: currentUser.id,
         patient: name,
         mode: mode,
@@ -571,10 +571,22 @@ if (!nameInput.value.trim()) {
         unit: unit.name,
         date_iso: state.dateISO,
         time: state.time
-      });
+      }).select("id").single();
       if (error) throw error;
+      let emailPending = false;
+      if (bookedAppointment?.id) {
+        try {
+          const { data: emailResult, error: emailInvokeError } = await supabaseClient.functions.invoke("appointment-emails", {
+            body: { appointment_id: bookedAppointment.id, event: "CONFIRMACAO" }
+          });
+          emailPending = Boolean(emailInvokeError || emailResult?.failed);
+        } catch (_) {
+          emailPending = true; // O cron processará a confirmação pendente.
+        }
+      }
       await loadAppointments();
-      showToast("Pronto! Sua consulta foi marcada com " + pro.name + ".");
+      if (emailPending) showToast("Consulta marcada. O e-mail de confirmação ficou na fila para nova tentativa.", "error");
+      else showToast("Pronto! Sua consulta foi marcada com " + pro.name + ".");
     } catch (error) {
       setStatus("Não foi possível marcar a consulta. Verifique sua internet e tente novamente.");
       return;
