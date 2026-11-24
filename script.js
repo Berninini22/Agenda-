@@ -2,7 +2,7 @@
   "use strict";
 
   /* ===================================================
-     Dados mockados (simulam um back-end)
+     Catálogo de especialidades da agenda
      =================================================== */
   const SPECIALTIES = [
     { id: "clinico", name: "Clínico Geral", icon: "🩺", meta: "Cuida da saúde em geral", help: "Para avaliar sintomas e orientar os próximos cuidados.", telehealth: false },
@@ -16,52 +16,8 @@
     { id: "neurologia", name: "Neurologia", icon: "🧠", meta: "Cuida do sistema nervoso", help: "Para avaliar cérebro, nervos, memória e movimentos.", telehealth: false }
   ];
 
-  /* Cada profissional pode atender em mais de uma unidade */
-  const UNITS = {
-    centro: { id: "centro", name: "Unidade Centro", address: "Av. Paulista, 1200 — Centro" },
-    norte: { id: "norte", name: "Unidade Norte", address: "Rua Voluntários da Pátria, 450 — Norte" },
-    sul: { id: "sul", name: "Unidade Sul", address: "Av. Interlagos, 980 — Sul" }
-  };
+  const PROFESSIONALS = Object.fromEntries(SPECIALTIES.map((specialty) => [specialty.id, []]));
 
-  const PROFESSIONALS = {
-    clinico: [
-      { id: "p1", name: "Dr. Marcos Vieira", crm: "CRM 12345-SP", units: [UNITS.centro, UNITS.norte] },
-      { id: "p2", name: "Dra. Beatriz Nunes", crm: "CRM 22110-SP", units: [UNITS.norte] }
-    ],
-    cardio: [
-      { id: "p3", name: "Dra. Helena Duarte", crm: "CRM 33456-SP", units: [UNITS.centro, UNITS.sul] },
-      { id: "p4", name: "Dr. Otávio Ramos", crm: "CRM 44120-SP", units: [UNITS.sul] }
-    ],
-    pediatria: [
-      { id: "p5", name: "Dra. Camila Prado", crm: "CRM 55678-SP", units: [UNITS.norte, UNITS.centro] }
-    ],
-    dermato: [
-      { id: "p6", name: "Dr. Felipe Costa", crm: "CRM 66789-SP", units: [UNITS.centro] },
-      { id: "p7", name: "Dra. Renata Lima", crm: "CRM 77234-SP", units: [UNITS.sul, UNITS.norte] }
-    ],
-    ortopedia: [
-      { id: "p8", name: "Dr. André Silveira", crm: "CRM 88345-SP", units: [UNITS.sul, UNITS.centro] },
-      { id: "p9", name: "Dra. Paula Mendes", crm: "CRM 90412-SP", units: [UNITS.centro, UNITS.norte] }
-    ],
-    psicologia: [
-      { id: "p10", name: "Dra. Laura Campos", crm: "CRP 06/18421", units: [UNITS.centro, UNITS.norte] },
-      { id: "p11", name: "Dr. Rafael Moura", crm: "CRP 06/22714", units: [UNITS.sul] }
-    ],
-    nutricao: [
-      { id: "p12", name: "Dra. Marina Lopes", crm: "CRN 3 45821", units: [UNITS.centro, UNITS.sul] },
-      { id: "p13", name: "Dra. Júlia Reis", crm: "CRN 3 50117", units: [UNITS.norte] }
-    ],
-    ginecologia: [
-      { id: "p14", name: "Dra. Fernanda Alves", crm: "CRM 71234-SP", units: [UNITS.centro, UNITS.norte] },
-      { id: "p15", name: "Dra. Patrícia Gomes", crm: "CRM 74518-SP", units: [UNITS.sul] }
-    ],
-    neurologia: [
-      { id: "p16", name: "Dr. Henrique Silva", crm: "CRM 68190-SP", units: [UNITS.centro] },
-      { id: "p17", name: "Dra. Elisa Martins", crm: "CRM 69542-SP", units: [UNITS.norte, UNITS.sul] }
-    ]
-  };
-
-  const TIME_SLOTS = ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"];
   const DOW_LABELS = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
 
   /* ===================================================
@@ -80,6 +36,7 @@
   let appointments = [];
   let doctorDirectory = [];
   let pendingCancellation = null;
+  let slotLoadRequest = 0;
   const supabaseClient = window.supabase && window.SUPABASE_URL && window.SUPABASE_PUBLISHABLE_KEY
     ? window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_PUBLISHABLE_KEY)
     : null;
@@ -120,20 +77,24 @@
   async function loadDoctors() {
     const { data, error } = await supabaseClient
       .from("profiles")
-      .select("user_id, full_name, crm, crm_state, specialty, avatar_url, clinic_name, clinic_address")
+      .select("user_id, full_name, crm, crm_state, specialty, avatar_url, clinic_name, clinic_address, availability")
       .eq("role", "doctor")
       .order("full_name", { ascending: true });
-    if (error) return;
+    if (error) throw error;
     doctorDirectory = data || [];
+    SPECIALTIES.forEach((specialty) => { PROFESSIONALS[specialty.id] = []; });
     doctorDirectory.forEach((doctor) => {
       const specialty = SPECIALTIES.find((item) => item.name === doctor.specialty);
-      if (!specialty || PROFESSIONALS[specialty.id].some((item) => item.user_id === doctor.user_id)) return;
+      if (!specialty) return;
       PROFESSIONALS[specialty.id].push({
         id: "doctor-" + doctor.user_id,
         user_id: doctor.user_id,
-        name: doctor.full_name || "Médico Agenda+",
-        crm: doctor.crm ? "CRM " + doctor.crm + (doctor.crm_state ? "-" + doctor.crm_state : "") : "CRM não informado",
+        name: doctor.full_name || "Médico de demonstração — TESTE",
+        crm: doctor.crm
+          ? `CRM ${doctor.crm}${doctor.crm_state ? "-" + doctor.crm_state : ""}`
+          : "Profissional de demonstração — TESTE",
         avatar_url: doctor.avatar_url || "",
+        availability: doctor.availability || {},
         units: [{
           id: "profile-unit-" + doctor.user_id,
           name: doctor.clinic_name || "Atendimento profissional",
@@ -162,7 +123,7 @@
   }
 
   function isoOf(date) {
-    return date.toISOString().slice(0, 10);
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
   }
 
   function formatFullDate(iso) {
@@ -175,6 +136,12 @@
     if (className) node.className = className;
     if (html !== undefined) node.innerHTML = html;
     return node;
+  }
+
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"
+    })[char]);
   }
 
   function showToast(message, type = "success") {
@@ -240,11 +207,36 @@
     }
   });
 
-  /* Slots indisponíveis simulados, determinísticos por data */
-  function unavailableSlotsFor(iso) {
-    const seed = iso.split("-").join("");
-    const n = parseInt(seed, 10) % TIME_SLOTS.length;
-    return new Set([TIME_SLOTS[n], TIME_SLOTS[(n + 3) % TIME_SLOTS.length]]);
+  const DAY_KEYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+  const APPOINTMENT_DURATION_MINUTES = 60;
+
+  function selectedProfessional() {
+    const specialty = SPECIALTIES.find((item) => item.id === state.specialtyId);
+    return specialty ? PROFESSIONALS[specialty.id].find((item) => item.id === state.professionalId) : null;
+  }
+
+  function timeToMinutes(value) {
+    const parts = String(value || "").slice(0, 5).split(":").map(Number);
+    return parts.length === 2 && parts.every(Number.isFinite) ? parts[0] * 60 + parts[1] : NaN;
+  }
+
+  function periodsForDay(pro, iso) {
+    const weekday = new Date(`${iso}T12:00:00`).getDay();
+    const day = pro?.availability?.[DAY_KEYS[weekday]];
+    if (!day || typeof day !== "object") return [];
+    if (day.morning || day.afternoon) {
+      return [day.morning, day.afternoon].filter((period) => period?.enabled)
+        .map((period) => ({ start: period.start, end: period.end }));
+    }
+    return day.enabled ? [{ start: day.start, end: day.end }] : [];
+  }
+
+  function hasScheduledHours(pro, iso) {
+    return periodsForDay(pro, iso).some((period) => {
+      const start = timeToMinutes(period.start);
+      const end = timeToMinutes(period.end);
+      return Number.isFinite(start) && Number.isFinite(end) && end - start >= APPOINTMENT_DURATION_MINUTES;
+    });
   }
 
   /* ===================================================
@@ -253,7 +245,12 @@
   function renderSpecialties() {
     const grid = document.getElementById("specialtyGrid");
     grid.innerHTML = "";
-    SPECIALTIES.forEach((sp) => {
+    const availableSpecialties = SPECIALTIES.filter((sp) => PROFESSIONALS[sp.id]?.length);
+    if (!availableSpecialties.length) {
+      grid.appendChild(el("p", "booking-empty", "Ainda não há médicos cadastrados para agendamento. Volte mais tarde ou fale com a clínica."));
+      return;
+    }
+    availableSpecialties.forEach((sp) => {
       const card = el("button", "option-card");
       card.type = "button";
       card.setAttribute("role", "radio");
@@ -267,6 +264,9 @@
         state.specialtyId = sp.id;
         state.professionalId = null;
         state.locationId = null;
+        state.dateISO = null;
+        state.time = null;
+        state.mode = null;
         renderSpecialties();
         setStatus("");
       });
@@ -297,16 +297,18 @@
       const initials = pro.name.split(" ").filter(w => w.length > 2).slice(0, 2).map(w => w[0]).join("");
       const unitNames = pro.units.map((u) => u.name).join(" · ");
       row.innerHTML =
-        '<span class="pro-avatar" aria-hidden="true">' + initials + '</span>' +
+        '<span class="pro-avatar" aria-hidden="true">' + escapeHTML(initials) + '</span>' +
         '<span class="pro-info">' +
-        '<span class="pro-name">' + pro.name + '</span><br>' +
-        '<span class="pro-meta">' + pro.crm + '</span><br>' +
-        '<span class="pro-meta">Atende em: ' + unitNames + '</span>' +
+        '<span class="pro-name">' + escapeHTML(pro.name) + '</span><br>' +
+        '<span class="pro-meta">' + escapeHTML(pro.crm) + '</span><br>' +
+        '<span class="pro-meta">Atende em: ' + escapeHTML(unitNames) + '</span>' +
         '</span>';
       row.addEventListener("click", () => {
         state.professionalId = pro.id;
         state.locationId = null;
         state.mode = null;
+        state.dateISO = null;
+        state.time = null;
         renderProfessionals();
         setStatus("");
       });
@@ -328,6 +330,11 @@
       chip.setAttribute("role", "radio");
       chip.setAttribute("aria-checked", String(state.dateISO === iso));
       chip.setAttribute("aria-label", formatFullDate(iso));
+      const hasHours = hasScheduledHours(selectedProfessional(), iso);
+      if (!hasHours) {
+        chip.disabled = true;
+        chip.setAttribute("aria-label", formatFullDate(iso) + ", sem atendimento");
+      }
       chip.innerHTML = '<span class="dow">' + dow + '</span><span class="dom">' + dom + '</span>';
       chip.addEventListener("click", () => {
         state.dateISO = iso;
@@ -340,29 +347,55 @@
     });
   }
 
-  function renderTimes() {
+  async function renderTimes() {
     const grid = document.getElementById("timeGrid");
+    const requestId = ++slotLoadRequest;
     grid.innerHTML = "";
     if (!state.dateISO) return;
-    const unavailable = unavailableSlotsFor(state.dateISO);
-    TIME_SLOTS.forEach((time) => {
-      const chip = el("button", "time-chip", time);
-      chip.type = "button";
-      chip.setAttribute("role", "radio");
-      const isUnavailable = unavailable.has(time);
-      chip.setAttribute("aria-checked", String(state.time === time));
-      if (isUnavailable) {
-        chip.disabled = true;
-        chip.setAttribute("aria-label", time + ", indisponível");
-      } else {
+    const pro = selectedProfessional();
+    if (!pro?.user_id) {
+      grid.appendChild(el("p", "booking-empty", "Escolha um médico cadastrado para ver os horários."));
+      return;
+    }
+    if (!hasScheduledHours(pro, state.dateISO)) {
+      grid.appendChild(el("p", "booking-empty", "Este médico não atende neste dia."));
+      return;
+    }
+    grid.appendChild(el("p", "booking-loading", "Carregando horários disponíveis…"));
+    try {
+      const { data, error } = await supabaseClient.rpc("available_appointment_times", {
+        p_doctor_id: pro.user_id,
+        p_date: state.dateISO
+      });
+      if (requestId !== slotLoadRequest) return;
+      if (error) throw error;
+      grid.innerHTML = "";
+      const times = (data || []).map((row) => String(row.slot_time).slice(0, 5));
+      if (!times.length) {
+        grid.appendChild(el("p", "booking-empty", "Não há horários livres para este dia. Escolha outra data."));
+        return;
+      }
+      times.forEach((time) => {
+        const chip = el("button", "time-chip");
+        chip.type = "button";
+        chip.textContent = time;
+        chip.setAttribute("role", "radio");
+        chip.setAttribute("aria-checked", String(state.time === time));
         chip.addEventListener("click", () => {
           state.time = time;
-          renderTimes();
+          grid.querySelectorAll(".time-chip").forEach((button) => {
+            button.setAttribute("aria-checked", String(button.textContent === time));
+          });
           setStatus("");
         });
-      }
-      grid.appendChild(chip);
-    });
+        grid.appendChild(chip);
+      });
+    } catch (error) {
+      if (requestId !== slotLoadRequest) return;
+      grid.innerHTML = "";
+      grid.appendChild(el("p", "booking-empty", "Não foi possível consultar os horários. Tente novamente."));
+      setStatus(friendlyError(error, "Não foi possível consultar os horários do médico."));
+    }
   }
 
   /* ===================================================
@@ -477,7 +510,7 @@
       row("Local", locationText);
 
     function row(label, value) {
-      return '<div class="sum-row"><span class="sum-label">' + label + '</span><span class="sum-value">' + value + '</span></div>';
+      return '<div class="sum-row"><span class="sum-label">' + escapeHTML(label) + '</span><span class="sum-value">' + escapeHTML(value) + '</span></div>';
     }
   }
 
@@ -561,22 +594,43 @@ if (!nameInput.value.trim()) {
     }
 
     try {
-      const { error } = await supabaseClient.from("appointments").insert({
-        user_id: currentUser.id,
-        patient: name,
-        mode: mode,
-        specialty: specialty.name,
-        professional: pro.name,
-        doctor_id: pro.user_id || null,
-        unit: unit.name,
-        date_iso: state.dateISO,
-        time: state.time
+      const { data: bookedData, error } = await supabaseClient.rpc("book_appointment", {
+        p_user_id: currentUser.id,
+        p_doctor_id: pro.user_id,
+        p_patient: name,
+        p_mode: mode,
+        p_specialty: specialty.name,
+        p_professional: pro.name,
+        p_unit: unit.name,
+        p_date: state.dateISO,
+        p_time: state.time,
+        p_location_id: null,
+        p_slot_id: null
       });
       if (error) throw error;
+      const bookedAppointment = Array.isArray(bookedData) ? bookedData[0] : bookedData;
+      let emailPending = false;
+      if (bookedAppointment?.id) {
+        try {
+          const { data: emailResult, error: emailInvokeError } = await supabaseClient.functions.invoke("appointment-emails", {
+            body: { appointment_id: bookedAppointment.id, event: "CONFIRMACAO" }
+          });
+          emailPending = Boolean(emailInvokeError || emailResult?.failed);
+        } catch (_) {
+          emailPending = true; // O cron processará a confirmação pendente.
+        }
+      }
       await loadAppointments();
-      showToast("Pronto! Sua consulta foi marcada com " + pro.name + ".");
+      if (emailPending) showToast("Consulta marcada. O e-mail de confirmação ficou na fila para nova tentativa.", "error");
+      else showToast("Pronto! Sua consulta foi marcada com " + pro.name + ".");
     } catch (error) {
-      setStatus("Não foi possível marcar a consulta. Verifique sua internet e tente novamente.");
+      const reason = String(error?.message || "").toLowerCase();
+      if (reason.includes("slot_already_booked") || reason.includes("slot_unavailable")) {
+        setStatus("Esse horário acabou de ficar indisponível. Escolha outro horário.");
+        await renderTimes();
+      } else {
+        setStatus(friendlyError(error, "Não foi possível marcar a consulta. Verifique sua internet e tente novamente."));
+      }
       return;
     }
 
@@ -627,7 +681,7 @@ if (!nameInput.value.trim()) {
     });
   }
 
-  
+
 
   /* ===================================================
      Menu mobile
