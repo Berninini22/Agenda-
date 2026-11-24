@@ -10,27 +10,27 @@ O README aponta como aplicação ativa um frontend estático HTML/CSS/JavaScript
 - Nova página `terms.html`, link para leitura integral no cadastro e resumo de termos em `home.html`.
 - Filtro na lista de consultas recebidas do médico por dia da semana e manhã/tarde.
 - Migração Supabase adiciona estrutura relacional para locais, vínculos médico-local, slots recorrentes segmentados por dia e turno, logs de notificação e RPC transacional para reserva, com índice único como proteção contra dupla reserva.
-- Painel assistivo recolhível conectado à Edge Function `accessibility-assistant`. A função exige usuário autenticado, valida tamanho da pergunta e usa chave de IA apenas no ambiente servidor. Sem implantação/chave, apresenta indisponibilidade, sem resposta fictícia.
+- O assistente textual de acessibilidade foi removido nesta atualização porque dependia de uma Edge Function e de credenciais externas não implantadas. O modo confortável, os controles visuais e o VLibras permanecem disponíveis.
 - Mantido o VLibras Widget que já existia no projeto. O catálogo ConectaGov descreve funções de tradução para glosa, sinais e geração/consulta de vídeo; não é um serviço genérico de usuários. A descrição do catálogo lista `GET /signs`, `GET /translate`, operações `POST /video` e consulta/retorno do vídeo [1]. Esta versão não implementa chamadas diretas a essas rotas; conserva o Widget oficial já carregado.
 
 ## Arquivos criados/modificados
 
-Criados: `terms.html`, `supabase-upgrade.sql`, `accessibility-assistant.js`, `supabase/functions/accessibility-assistant/index.ts` e este relatório.
+Criados: `terms.html`, `supabase-upgrade.sql` e este relatório. Os arquivos do assistente textual foram removidos nesta atualização.
 
 Modificados: `auth.html`, `auth.js`, `home.html`, `doctor.html`, `doctor.js`, `index.html`, `css/style.css` e `README.md`.
 
 ## Como configurar
 
 1. Faça backup do projeto Supabase. Execute primeiro `supabase-schema.sql` se o schema base ainda não estiver criado; depois revise e execute `supabase-upgrade.sql` no SQL Editor. O índice de unicidade pode falhar se já houver reservas duplicadas para o mesmo médico/data/hora; identifique e resolva esses casos antes de aplicar.
-2. Para IA, publique `supabase/functions/accessibility-assistant/index.ts` como Edge Function `accessibility-assistant`; configure os secrets `OPENAI_API_KEY`, `APP_ORIGIN` e, opcionalmente, `OPENAI_MODEL`. O frontend chama a função somente com sessão autenticada. Não use chave de provedor nem `service_role` no browser.
+2. O assistente textual de perguntas foi removido do frontend e sua Edge Function não faz parte desta versão.
 3. O VLibras Widget existente não exige segredo publicado pela aplicação. Consulte o guia oficial para detalhes da incorporação [2].
 4. Para WhatsApp Cloud API, são necessários conta/app Meta, número, token de usuário de sistema, permissões e webhook HTTPS. A documentação da Meta descreve envio de mensagens e webhook de status [3]. E-mail requer escolha e credencial de provedor.
 
 ## Testes executados
 
-- `node --check` passou em `auth.js`, `script.js`, `doctor.js`, `accessibility.js` e `accessibility-assistant.js`.
+- `node --check` passou em `auth.js`, `script.js`, `doctor.js`, `accessibility.js`.
 - Parser HTML padrão leu sem erro as páginas `home.html`, `auth.html`, `index.html`, `doctor.html` e `terms.html`.
-- Smoke test HTTP local obteve 200 nas páginas principais, SQL, cliente do assistente e função backend.
+- Smoke test HTTP local obteve 200 nas páginas principais, e SQL.
 - SQLite legado retornou `integrity_check = ok`, com 1 linha em `users` e 1 em `appointments`.
 - Não foram testados cadastro ou escrita no Supabase, execução PostgreSQL da migração, reserva concorrente real, retorno do modelo de IA, entrega de e-mail/WhatsApp nem navegação real em browser: dependem do projeto Supabase/credenciais e não são validados por testes estáticos.
 

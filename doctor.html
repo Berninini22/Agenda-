@@ -139,15 +139,85 @@
                 </div>
                 <span class="availability-count" id="availabilityCount">5 dias</span>
               </div>
-              <p class="card-description">Marque os dias e o horário em que você atende. Os pacientes verão esses horários.</p>
+              <p class="card-description">Ative manhã e tarde separadamente e defina o início e o fim de cada período.</p>
               <form id="availabilityForm" class="availability-form">
-                <div class="availability-row" data-day="monday"><label><input type="checkbox" checked> <span>Segunda-feira</span></label><div class="availability-times"><input aria-label="Início segunda-feira" type="time" value="08:00"><span>até</span><input aria-label="Fim segunda-feira" type="time" value="18:00"></div></div>
-                <div class="availability-row" data-day="tuesday"><label><input type="checkbox" checked> <span>Terça-feira</span></label><div class="availability-times"><input aria-label="Início terça-feira" type="time" value="08:00"><span>até</span><input aria-label="Fim terça-feira" type="time" value="18:00"></div></div>
-                <div class="availability-row" data-day="wednesday"><label><input type="checkbox" checked> <span>Quarta-feira</span></label><div class="availability-times"><input aria-label="Início quarta-feira" type="time" value="08:00"><span>até</span><input aria-label="Fim quarta-feira" type="time" value="18:00"></div></div>
-                <div class="availability-row" data-day="thursday"><label><input type="checkbox" checked> <span>Quinta-feira</span></label><div class="availability-times"><input aria-label="Início quinta-feira" type="time" value="08:00"><span>até</span><input aria-label="Fim quinta-feira" type="time" value="18:00"></div></div>
-                <div class="availability-row" data-day="friday"><label><input type="checkbox" checked> <span>Sexta-feira</span></label><div class="availability-times"><input aria-label="Início sexta-feira" type="time" value="08:00"><span>até</span><input aria-label="Fim sexta-feira" type="time" value="18:00"></div></div>
-                <div class="availability-row" data-day="saturday"><label><input type="checkbox"> <span>Sábado</span></label><div class="availability-times"><input aria-label="Início sábado" type="time" value="08:00"><span>até</span><input aria-label="Fim sábado" type="time" value="12:00"></div></div>
-                <div class="availability-row" data-day="sunday"><label><input type="checkbox"> <span>Domingo</span></label><div class="availability-times"><input aria-label="Início domingo" type="time" value="08:00"><span>até</span><input aria-label="Fim domingo" type="time" value="12:00"></div></div>
+                <div class="availability-row" data-day="monday">
+                  <strong class="availability-day">Segunda-feira</strong>
+                  <div class="availability-period" data-period="morning">
+                    <label><input type="checkbox" checked> <span>Manhã</span></label>
+                    <div class="availability-times"><input aria-label="Início da manhã — Segunda-feira" type="time" value="08:00"><span>até</span><input aria-label="Fim da manhã — Segunda-feira" type="time" value="12:00"></div>
+                  </div>
+                  <div class="availability-period" data-period="afternoon">
+                    <label><input type="checkbox" checked> <span>Tarde</span></label>
+                    <div class="availability-times"><input aria-label="Início da tarde — Segunda-feira" type="time" value="13:00"><span>até</span><input aria-label="Fim da tarde — Segunda-feira" type="time" value="18:00"></div>
+                  </div>
+                </div>
+                <div class="availability-row" data-day="tuesday">
+                  <strong class="availability-day">Terça-feira</strong>
+                  <div class="availability-period" data-period="morning">
+                    <label><input type="checkbox" checked> <span>Manhã</span></label>
+                    <div class="availability-times"><input aria-label="Início da manhã — Terça-feira" type="time" value="08:00"><span>até</span><input aria-label="Fim da manhã — Terça-feira" type="time" value="12:00"></div>
+                  </div>
+                  <div class="availability-period" data-period="afternoon">
+                    <label><input type="checkbox" checked> <span>Tarde</span></label>
+                    <div class="availability-times"><input aria-label="Início da tarde — Terça-feira" type="time" value="13:00"><span>até</span><input aria-label="Fim da tarde — Terça-feira" type="time" value="18:00"></div>
+                  </div>
+                </div>
+                <div class="availability-row" data-day="wednesday">
+                  <strong class="availability-day">Quarta-feira</strong>
+                  <div class="availability-period" data-period="morning">
+                    <label><input type="checkbox" checked> <span>Manhã</span></label>
+                    <div class="availability-times"><input aria-label="Início da manhã — Quarta-feira" type="time" value="08:00"><span>até</span><input aria-label="Fim da manhã — Quarta-feira" type="time" value="12:00"></div>
+                  </div>
+                  <div class="availability-period" data-period="afternoon">
+                    <label><input type="checkbox" checked> <span>Tarde</span></label>
+                    <div class="availability-times"><input aria-label="Início da tarde — Quarta-feira" type="time" value="13:00"><span>até</span><input aria-label="Fim da tarde — Quarta-feira" type="time" value="18:00"></div>
+                  </div>
+                </div>
+                <div class="availability-row" data-day="thursday">
+                  <strong class="availability-day">Quinta-feira</strong>
+                  <div class="availability-period" data-period="morning">
+                    <label><input type="checkbox" checked> <span>Manhã</span></label>
+                    <div class="availability-times"><input aria-label="Início da manhã — Quinta-feira" type="time" value="08:00"><span>até</span><input aria-label="Fim da manhã — Quinta-feira" type="time" value="12:00"></div>
+                  </div>
+                  <div class="availability-period" data-period="afternoon">
+                    <label><input type="checkbox" checked> <span>Tarde</span></label>
+                    <div class="availability-times"><input aria-label="Início da tarde — Quinta-feira" type="time" value="13:00"><span>até</span><input aria-label="Fim da tarde — Quinta-feira" type="time" value="18:00"></div>
+                  </div>
+                </div>
+                <div class="availability-row" data-day="friday">
+                  <strong class="availability-day">Sexta-feira</strong>
+                  <div class="availability-period" data-period="morning">
+                    <label><input type="checkbox" checked> <span>Manhã</span></label>
+                    <div class="availability-times"><input aria-label="Início da manhã — Sexta-feira" type="time" value="08:00"><span>até</span><input aria-label="Fim da manhã — Sexta-feira" type="time" value="12:00"></div>
+                  </div>
+                  <div class="availability-period" data-period="afternoon">
+                    <label><input type="checkbox" checked> <span>Tarde</span></label>
+                    <div class="availability-times"><input aria-label="Início da tarde — Sexta-feira" type="time" value="13:00"><span>até</span><input aria-label="Fim da tarde — Sexta-feira" type="time" value="18:00"></div>
+                  </div>
+                </div>
+                <div class="availability-row" data-day="saturday">
+                  <strong class="availability-day">Sábado</strong>
+                  <div class="availability-period" data-period="morning">
+                    <label><input type="checkbox" checked> <span>Manhã</span></label>
+                    <div class="availability-times"><input aria-label="Início da manhã — Sábado" type="time" value="08:00"><span>até</span><input aria-label="Fim da manhã — Sábado" type="time" value="12:00"></div>
+                  </div>
+                  <div class="availability-period" data-period="afternoon">
+                    <label><input type="checkbox"> <span>Tarde</span></label>
+                    <div class="availability-times"><input aria-label="Início da tarde — Sábado" type="time" value="13:00"><span>até</span><input aria-label="Fim da tarde — Sábado" type="time" value="18:00"></div>
+                  </div>
+                </div>
+                <div class="availability-row" data-day="sunday">
+                  <strong class="availability-day">Domingo</strong>
+                  <div class="availability-period" data-period="morning">
+                    <label><input type="checkbox"> <span>Manhã</span></label>
+                    <div class="availability-times"><input aria-label="Início da manhã — Domingo" type="time" value="08:00"><span>até</span><input aria-label="Fim da manhã — Domingo" type="time" value="12:00"></div>
+                  </div>
+                  <div class="availability-period" data-period="afternoon">
+                    <label><input type="checkbox"> <span>Tarde</span></label>
+                    <div class="availability-times"><input aria-label="Início da tarde — Domingo" type="time" value="13:00"><span>até</span><input aria-label="Fim da tarde — Domingo" type="time" value="18:00"></div>
+                  </div>
+                </div>
                 <button class="btn btn-primary btn-block" type="submit" id="saveAvailability">Salvar meus horários</button>
               </form>
             </article>
@@ -162,8 +232,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js?v=4"></script>
   <script src="js/accessibility.js?v=2"></script>
-  <script src="accessibility-assistant.js?v=1"></script>
-  <script src="js/doctor.js?v=5"></script>
+  <script src="js/doctor.js?v=6"></script>
   <script src="https://vlibras.gov.br/app/vlibras-plugin.js" defer></script>
 </body>
 </html>

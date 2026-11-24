@@ -68,13 +68,7 @@ O cadastro passou a exigir a aceitação dos Termos de Uso e registra a versão 
 
 A migração `supabase-upgrade.sql` adiciona tabelas normalizadas para locais, associação médico-local, slots semanais por dia/turno, logs de notificações e uma função transacional para impedir reservas concorrentes duplicadas. **O fluxo atualmente publicado ainda usa `profiles.availability` e o cadastro de consultas do frontend; a gestão do painel e o agendamento precisam ser migrados para `doctor_slots`/`book_appointment` antes de ativar essa nova estrutura em produção.** Não execute a migração em produção sem backup e validação dos dados existentes.
 
-O filtro no painel médico consulta os agendamentos carregados e permite filtrar dia da semana e manhã/tarde. O assistente de acessibilidade é um cliente para a Edge Function `supabase/functions/accessibility-assistant/index.ts`; sem implantação e sem `OPENAI_API_KEY`, ele informa indisponibilidade e não inventa respostas.
-
-### Deploy do assistente
-
-1. Configure no projeto Supabase os secrets `OPENAI_API_KEY`, `OPENAI_MODEL` (opcional; padrão `gpt-4o-mini`) e `APP_ORIGIN` (origem do site).
-2. Publique `accessibility-assistant` com Supabase CLI (`supabase functions deploy accessibility-assistant`). A validação JWT permanece habilitada.
-3. Use uma chave de API de servidor em secrets; nunca inclua `service_role` ou chave de provedor nos arquivos HTML/JS.
+O filtro no painel médico consulta os agendamentos carregados e permite filtrar dia da semana e manhã/tarde. A caixa de perguntas do assistente textual foi retirada das páginas; continuam disponíveis o modo confortável, os controles visuais e o VLibras.
 
 ### VLibras e API governamental
 

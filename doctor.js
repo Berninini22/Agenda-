@@ -12,13 +12,13 @@
     sunday: "Domingo"
   };
   const DEFAULT_AVAILABILITY = {
-    monday: { enabled: true, start: "08:00", end: "18:00" },
-    tuesday: { enabled: true, start: "08:00", end: "18:00" },
-    wednesday: { enabled: true, start: "08:00", end: "18:00" },
-    thursday: { enabled: true, start: "08:00", end: "18:00" },
-    friday: { enabled: true, start: "08:00", end: "18:00" },
-    saturday: { enabled: false, start: "08:00", end: "12:00" },
-    sunday: { enabled: false, start: "08:00", end: "12:00" }
+    monday: { morning: { enabled: true, start: "08:00", end: "12:00" }, afternoon: { enabled: true, start: "13:00", end: "18:00" } },
+    tuesday: { morning: { enabled: true, start: "08:00", end: "12:00" }, afternoon: { enabled: true, start: "13:00", end: "18:00" } },
+    wednesday: { morning: { enabled: true, start: "08:00", end: "12:00" }, afternoon: { enabled: true, start: "13:00", end: "18:00" } },
+    thursday: { morning: { enabled: true, start: "08:00", end: "12:00" }, afternoon: { enabled: true, start: "13:00", end: "18:00" } },
+    friday: { morning: { enabled: true, start: "08:00", end: "12:00" }, afternoon: { enabled: true, start: "13:00", end: "18:00" } },
+    saturday: { morning: { enabled: true, start: "08:00", end: "12:00" }, afternoon: { enabled: false, start: "13:00", end: "18:00" } },
+    sunday: { morning: { enabled: false, start: "08:00", end: "12:00" }, afternoon: { enabled: false, start: "13:00", end: "18:00" } }
   };
 
   let currentUser = null;
@@ -140,32 +140,64 @@
 
   function readAvailability() {
     const raw = profile?.availability && typeof profile.availability === "object" ? profile.availability : {};
-    return Object.fromEntries(Object.keys(DEFAULT_AVAILABILITY).map((day) => [day, { ...DEFAULT_AVAILABILITY[day], ...(raw[day] || {}) }]));
+    return Object.fromEntries(Object.keys(DEFAULT_AVAILABILITY).map((day) => {
+      const saved = raw[day] && typeof raw[day] === "object" ? raw[day] : {};
+      // Migrate the former { enabled, start, end } shape into morning/afternoon.
+      if (saved.morning || saved.afternoon) {
+        return [day, {
+          morning: { ...DEFAULT_AVAILABILITY[day].morning, ...(saved.morning || {}) },
+          afternoon: { ...DEFAULT_AVAILABILITY[day].afternoon, ...(saved.afternoon || {}) }
+        }];
+      }
+      if (typeof saved.enabled === "boolean") {
+        const start = saved.start || "08:00";
+        const end = saved.end || "18:00";
+        const active = saved.enabled && start < end;
+        const morningStart = start > "12:00" ? "12:00" : start;
+        const morningEnd = end < "12:00" ? end : "12:00";
+        const afternoonStart = start > "12:00" ? start : "13:00";
+        return [day, {
+          morning: { enabled: active && morningStart < morningEnd, start: morningStart, end: morningEnd },
+          afternoon: { enabled: active && afternoonStart < end, start: afternoonStart, end }
+        }];
+      }
+      return [day, {
+        morning: { ...DEFAULT_AVAILABILITY[day].morning, ...(saved.morning || {}) },
+        afternoon: { ...DEFAULT_AVAILABILITY[day].afternoon, ...(saved.afternoon || {}) }
+      }];
+    }));
   }
 
   function applyAvailability() {
     const availability = readAvailability();
     document.querySelectorAll(".availability-row").forEach((row) => {
-      const value = availability[row.dataset.day];
-      const inputs = row.querySelectorAll("input");
-      inputs[0].checked = Boolean(value.enabled);
-      inputs[1].value = value.start || "08:00";
-      inputs[2].value = value.end || "18:00";
-      row.classList.toggle("is-disabled", !value.enabled);
+      const day = availability[row.dataset.day];
+      row.querySelectorAll(".availability-period").forEach((period) => {
+        const value = day[period.dataset.period];
+        const inputs = period.querySelectorAll("input");
+        inputs[0].checked = Boolean(value.enabled);
+        inputs[1].value = value.start || (period.dataset.period === "morning" ? "08:00" : "13:00");
+        inputs[2].value = value.end || (period.dataset.period === "morning" ? "12:00" : "18:00");
+        period.classList.toggle("is-disabled", !value.enabled);
+      });
     });
     updateAvailabilityCount();
   }
 
   function updateAvailabilityCount() {
-    const active = [...document.querySelectorAll('.availability-row input[type="checkbox"]')].filter((input) => input.checked).length;
+    const rows = [...document.querySelectorAll(".availability-row")];
+    const active = rows.filter((row) => [...row.querySelectorAll('.availability-period input[type="checkbox"]')].some((input) => input.checked)).length;
     $("#availabilityCount").textContent = `${active} ${active === 1 ? "dia" : "dias"}`;
     $("#activeDaysCount").textContent = String(active);
   }
 
   function readFormAvailability() {
     return Object.fromEntries([...document.querySelectorAll(".availability-row")].map((row) => {
-      const inputs = row.querySelectorAll("input");
-      return [row.dataset.day, { enabled: inputs[0].checked, start: inputs[1].value || "08:00", end: inputs[2].value || "18:00" }];
+      const periods = Object.fromEntries([...row.querySelectorAll(".availability-period")].map((period) => {
+        const inputs = period.querySelectorAll("input");
+        return [period.dataset.period, { enabled: inputs[0].checked, start: inputs[1].value, end: inputs[2].value }];
+      }));
+      return [row.dataset.day, periods];
     }));
   }
 
@@ -201,13 +233,21 @@
 
     const list = $("#doctorAppointmentsList");
     const empty = $("#doctorEmptyState");
+    const selectedDay = $("#appointmentDayFilter")?.value || "all";
+    const selectedPeriod = $("#appointmentPeriodFilter")?.value || "all";
+    const visibleAppointments = upcoming.filter((appointment) => {
+      const weekday = new Date(`${appointment.date_iso}T00:00:00`).getDay();
+      const morning = String(appointment.time).slice(0, 5) < "12:00";
+      return (selectedDay === "all" || String(weekday) === selectedDay) &&
+        (selectedPeriod === "all" || (selectedPeriod === "morning" ? morning : !morning));
+    });
     list.innerHTML = "";
-    if (upcoming.length === 0) {
+    if (visibleAppointments.length === 0) {
       empty.classList.remove("is-hidden");
       return;
     }
     empty.classList.add("is-hidden");
-    upcoming.forEach((appointment) => {
+    visibleAppointments.forEach((appointment) => {
       const article = document.createElement("article");
       article.className = "doctor-appointment-row";
       const date = new Date(`${appointment.date_iso}T00:00:00`);
@@ -224,8 +264,12 @@
     event.preventDefault();
     const button = $("#saveAvailability");
     const availability = readFormAvailability();
-    if (Object.values(availability).some((day) => day.enabled && day.start >= day.end)) {
-      showToast("Confira os horários. A hora de início precisa ser antes da hora de fim.", "error");
+    const invalidPeriod = Object.values(availability).some((day) =>
+      [day.morning, day.afternoon].some((period) => period.enabled && (!period.start || !period.end || period.start >= period.end)) ||
+      (day.morning.enabled && day.afternoon.enabled && day.morning.end > day.afternoon.start)
+    );
+    if (invalidPeriod) {
+      showToast("Confira os horários: o início deve ser anterior ao fim e manhã/tarde não podem se sobrepor.", "error");
       return;
     }
     button.disabled = true;
@@ -276,6 +320,8 @@
   function setupEvents() {
     $("#availabilityForm").addEventListener("submit", saveAvailability);
     $("#avatarInput").addEventListener("change", uploadAvatar);
+    $("#appointmentDayFilter").addEventListener("change", renderDashboard);
+    $("#appointmentPeriodFilter").addEventListener("change", renderDashboard);
     $("#refreshAppointments").addEventListener("click", async () => {
       try {
         await loadAppointments();
@@ -284,8 +330,8 @@
         showToast("Não foi possível atualizar as consultas. Confira sua internet e tente novamente.", "error");
       }
     });
-    document.querySelectorAll('.availability-row input[type="checkbox"]').forEach((input) => input.addEventListener("change", () => {
-      input.closest(".availability-row").classList.toggle("is-disabled", !input.checked);
+    document.querySelectorAll('.availability-period input[type="checkbox"]').forEach((input) => input.addEventListener("change", () => {
+      input.closest(".availability-period").classList.toggle("is-disabled", !input.checked);
       updateAvailabilityCount();
     }));
     $("#logoutButton").addEventListener("click", async () => {
