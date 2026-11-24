@@ -80,9 +80,11 @@ O filtro no painel médico consulta os agendamentos carregados e permite filtrar
 
 O projeto já carrega o VLibras Widget oficial em páginas principais. O catálogo ConectaGov descreve a suíte VLibras e enumera interfaces para sinais, tradução Português→glosa e geração/consulta de vídeo; não é uma API genérica de cadastro de pessoas ou dados de acessibilidade. Esta versão mantém o widget existente e não invoca os endpoints REST descritos no catálogo. Consulte os links oficiais indicados no relatório de implementação antes de qualquer integração direta, pois disponibilidade, autenticação e contrato técnico devem ser confirmados na documentação atual.
 
-### Notificações externas
+### Notificações por e-mail
 
-A tabela `notification_log` é apenas o modelo de auditoria. Envio de e-mail e WhatsApp não foi conectado: requer um backend/Edge Function, provedor e credenciais aprovadas. Para WhatsApp Cloud API, configure uma conta/app da Meta, número e token de usuário de sistema, permissões, modelos de mensagem quando aplicável e webhook HTTPS. Não colocar tokens no frontend. Nenhum envio foi simulado ou realizado.
+O projeto inclui uma Edge Function `appointment-emails` e a migração `supabase-email-notifications.sql` para e-mail de confirmação e lembrete um dia antes. A função consulta no Supabase o e-mail autenticado do paciente, os dados do perfil médico e as informações salvas na consulta. Usa fila idempotente, controle de falhas e cron no fuso de São Paulo. Para ativar, configure provedor e secrets, aplique a migração e publique a função conforme `EMAIL-SETUP.md`. O envio real depende dessa configuração no projeto Supabase.
+
+E-mail transacional usa a API HTTPS do Resend no servidor Edge; as credenciais ficam nas secrets do Supabase e nunca no frontend. O SMTP customizado do Supabase Auth é separado e destina-se aos fluxos de autenticação. Para WhatsApp Cloud API, configure uma conta/app da Meta, número e token de usuário de sistema, permissões, modelos de mensagem quando aplicável e webhook HTTPS. Essa integração de WhatsApp continua fora do escopo desta atualização.
 
 ### Dados de teste
 

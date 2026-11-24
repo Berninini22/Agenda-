@@ -5,8 +5,6 @@
   const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_PUBLISHABLE_KEY);
   const form = document.getElementById("authForm");
   const nameField = document.getElementById("nameField");
-  const termsConsent = document.getElementById("termsConsent");
-  const acceptTerms = document.getElementById("acceptTerms");
   const nameInput = document.getElementById("name");
   const roleField = document.getElementById("roleField");
   const roleInputs = [...document.querySelectorAll('input[name="role"]')];
@@ -66,8 +64,6 @@
   function renderMode() {
     const registering = mode === "register";
     nameField.hidden = !registering;
-    termsConsent.hidden = !registering;
-    acceptTerms.required = registering;
     roleField.hidden = !registering;
     nameInput.required = registering;
     passwordInput.autocomplete = registering ? "new-password" : "current-password";
@@ -125,14 +121,11 @@
         const name = nameInput.value.trim();
         const role = selectedRole();
         if (!name) throw new Error("Digite seu nome completo para continuar.");
-        if (!acceptTerms.checked) throw new Error("Você precisa aceitar os Termos de Uso para criar a conta.");
 
         const metadata = {
           full_name: name,
           role,
-          phone: document.getElementById("phone").value.trim(),
-          terms_accepted_at: new Date().toISOString(),
-          terms_version: "1.0"
+          phone: document.getElementById("phone").value.trim()
         };
 
         if (role === "doctor") {

@@ -38,7 +38,7 @@ Modificados: `auth.html`, `auth.js`, `home.html`, `doctor.html`, `doctor.js`, `i
 
 - A tela atual do médico ainda salva `profiles.availability` (JSON), não os novos registros `doctor_slots`; o seletor de locais também ainda não está ligado ao banco relacional. Portanto, cadastro de slots por local/manhã/tarde e filtro de agenda futura ainda exigem integração frontend/backend.
 - O fluxo atual de agendamento ainda envia INSERT diretamente a `appointments`; o índice SQL bloqueia colisões por médico, mas a UI não chama ainda `book_appointment` nem atualiza a disponibilidade consultada a partir dos slots. A nova rotina deve ser integrada antes de considerar reservas plenamente transacionais.
-- A tabela de log de notificações foi criada, mas não há dispatcher de e-mail/WhatsApp ou chatbot WhatsApp implementados. Nenhuma notificação foi enviada.
+- Foi acrescentado dispatcher de e-mail por Supabase Edge Function, fila SQL com deduplicação e cron; precisa aplicar `supabase-email-notifications.sql`, configurar secrets/domínio e publicar a função. O envio externo não foi testado nesta sessão. WhatsApp continua sem dispatcher.
 - O requisito de 20 registros úteis não foi atingido: há quatro locais de demonstração na migração e a base SQLite legada contém dois registros úteis totais. Médicos e pacientes dependem de UUIDs válidos do Supabase Auth; não criei perfis fictícios ligados a contas inexistentes.
 - O conteúdo dos Termos é uma base informativa para o projeto acadêmico e requer revisão jurídica e de privacidade antes de uso público real.
 
