@@ -168,16 +168,50 @@
     }));
   }
 
+  function populateAvailabilityTimeOptions() {
+    document.querySelectorAll(".availability-period").forEach((period) => {
+      const isMorning = period.dataset.period === "morning";
+      const first = isMorning ? 6 * 60 : 12 * 60;
+      const last = isMorning ? 12 * 60 : 23 * 60 + 45;
+      period.querySelectorAll("select").forEach((select) => {
+        const preferred = select.dataset.default;
+        select.replaceChildren();
+        for (let minutes = first; minutes <= last; minutes += 15) {
+          const option = document.createElement("option");
+          option.value = `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
+          option.textContent = option.value;
+          select.appendChild(option);
+        }
+        if (![...select.options].some((option) => option.value === preferred)) {
+          const option = document.createElement("option");
+          option.value = preferred;
+          option.textContent = preferred;
+          select.appendChild(option);
+        }
+      });
+    });
+  }
+
   function applyAvailability() {
     const availability = readAvailability();
     document.querySelectorAll(".availability-row").forEach((row) => {
       const day = availability[row.dataset.day];
       row.querySelectorAll(".availability-period").forEach((period) => {
         const value = day[period.dataset.period];
-        const inputs = period.querySelectorAll("input");
-        inputs[0].checked = Boolean(value.enabled);
-        inputs[1].value = value.start || (period.dataset.period === "morning" ? "08:00" : "13:00");
-        inputs[2].value = value.end || (period.dataset.period === "morning" ? "12:00" : "18:00");
+        const toggle = period.querySelector('input[type="checkbox"]');
+        const selects = period.querySelectorAll("select");
+        toggle.checked = Boolean(value.enabled);
+        const start = value.start || (period.dataset.period === "morning" ? "08:00" : "13:00");
+        const end = value.end || (period.dataset.period === "morning" ? "12:00" : "18:00");
+        [ [selects[0], start], [selects[1], end] ].forEach(([select, time]) => {
+          if (![...select.options].some((option) => option.value === time)) {
+            const option = document.createElement("option");
+            option.value = time;
+            option.textContent = time;
+            select.appendChild(option);
+          }
+          select.value = time;
+        });
         period.classList.toggle("is-disabled", !value.enabled);
       });
     });
@@ -186,16 +220,24 @@
 
   function updateAvailabilityCount() {
     const rows = [...document.querySelectorAll(".availability-row")];
-    const active = rows.filter((row) => [...row.querySelectorAll('.availability-period input[type="checkbox"]')].some((input) => input.checked)).length;
-    $("#availabilityCount").textContent = `${active} ${active === 1 ? "dia" : "dias"}`;
+    const active = rows.filter((row) => {
+      const toggles = [...row.querySelectorAll('.availability-period input[type="checkbox"]')];
+      const enabled = toggles.filter((input) => input.checked).length;
+      const status = row.querySelector(".availability-day-status");
+      status.textContent = enabled === 2 ? "Manhã e tarde" : enabled === 1 ? "1 turno" : "Folga";
+      status.classList.toggle("is-off", enabled === 0);
+      return enabled > 0;
+    }).length;
+    $("#availabilityCount").textContent = `${active} ${active === 1 ? "dia ativo" : "dias ativos"}`;
     $("#activeDaysCount").textContent = String(active);
   }
 
   function readFormAvailability() {
     return Object.fromEntries([...document.querySelectorAll(".availability-row")].map((row) => {
       const periods = Object.fromEntries([...row.querySelectorAll(".availability-period")].map((period) => {
-        const inputs = period.querySelectorAll("input");
-        return [period.dataset.period, { enabled: inputs[0].checked, start: inputs[1].value, end: inputs[2].value }];
+        const enabled = period.querySelector('input[type="checkbox"]').checked;
+        const selects = period.querySelectorAll("select");
+        return [period.dataset.period, { enabled, start: selects[0].value, end: selects[1].value }];
       }));
       return [row.dataset.day, periods];
     }));
@@ -358,6 +400,7 @@
     try {
       if (!(await loadProfile())) return;
       renderProfile();
+      populateAvailabilityTimeOptions();
       applyAvailability();
       const now = new Date();
       $("#todayLabel").textContent = now.toLocaleDateString("pt-BR", { weekday: "long" });

@@ -1229,3 +1229,39 @@ body.a11y-mode .confirm-icon{ width: 56px; height: 56px; }
 .availability-period.is-disabled .availability-times{opacity:.4}
 .availability-period.is-disabled .availability-times input{pointer-events:none}
 @media(max-width:460px){.availability-row{grid-template-columns:1fr 1fr;gap:7px}.availability-day{grid-column:1/-1}.availability-times input{width:calc((100% - 18px)/2);padding:6px 2px}.availability-period label{font-size:.7rem}}
+
+/* Disponibilidade: cartões de dia e seleção de horários mais clara */
+.availability-form{display:grid;gap:12px;margin-top:16px}
+.availability-row{display:block;padding:14px;border:1px solid #dce8e7;border-radius:14px;background:#fff;box-shadow:0 2px 7px rgba(22,48,55,.04)}
+.availability-day-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.availability-day{font-size:.9rem;font-weight:750;letter-spacing:-.01em}
+.availability-day-status{padding:4px 9px;border-radius:999px;background:#eaf5f2;color:#27634e;font-size:.65rem;font-weight:700;white-space:nowrap}
+.availability-day-status.is-off{background:#f1f3f4;color:#6f7c83}
+.availability-periods{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.availability-period{min-width:0;padding:10px;border:1px solid #e3ebeb;border-radius:11px;background:#f8fbfa;transition:background .15s,border-color .15s,opacity .15s}
+.availability-period:not(.is-disabled){border-color:#c9e2dc;background:#f4faf7}
+.availability-period-heading{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:9px}
+.availability-period-name{margin:0;color:#204b49;font-size:.77rem;font-weight:750}
+.availability-toggle{display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:#52666b;font-size:.66rem;font-weight:650;white-space:nowrap}
+.availability-toggle input{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;clip-path:inset(50%)}
+.availability-switch{position:relative;width:30px;height:17px;flex:0 0 30px;border-radius:999px;background:#c6d0d1;transition:background .16s}
+.availability-switch::after{position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #142d3733;content:"";transition:transform .16s}
+.availability-toggle input:checked+.availability-switch{background:#2f806a}
+.availability-toggle input:checked+.availability-switch::after{transform:translateX(13px)}
+.availability-toggle input:focus-visible+.availability-switch{outline:3px solid #e4a72f;outline-offset:2px}
+.availability-toggle-text{min-width:29px}
+.availability-times{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:end;gap:6px;margin:0;color:var(--text-muted);font-size:.65rem}
+.availability-times label{display:grid;min-width:0;gap:4px;color:#64757a;font-size:.62rem;font-weight:650}
+.availability-times select{width:100%;min-width:0;height:38px;padding:0 25px 0 9px;border:1px solid #cbd8d8;border-radius:8px;background-color:#fff;color:#18353a;font-family:inherit;font-size:.78rem;font-weight:600;line-height:1;font-variant-numeric:tabular-nums;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='m2 4 4 4 4-4' fill='none' stroke='%23566d70' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+.availability-times select:focus-visible{outline:3px solid #9ed1c4;outline-offset:1px;border-color:#2f806a}
+.availability-range-word{align-self:center;padding-top:15px;color:#8a989b;font-size:.66rem}
+.availability-period.is-disabled{background:#f6f7f7;border-color:#e7ebeb}
+.availability-period.is-disabled .availability-times{opacity:.48}
+.availability-period.is-disabled .availability-times select{background-color:#f1f3f3;color:#7e898c;cursor:not-allowed}
+.availability-card .card-description{max-width:44ch;line-height:1.55}
+@media(max-width:560px){.availability-periods{grid-template-columns:1fr}.availability-row{padding:12px}.availability-times select{height:42px;font-size:.84rem}}
+/* Em um painel lateral estreito, cada turno ocupa uma linha completa. */
+.availability-periods{grid-template-columns:minmax(0,1fr)}
+.availability-period-heading{min-height:28px}
+.availability-times label{min-width:0}
+.availability-times select{min-width:0;min-height:40px}

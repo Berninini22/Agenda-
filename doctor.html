@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=4">
+  <link rel="stylesheet" href="css/style.css?v=5">
 </head>
 <body class="doctor-page">
   <a class="skip-link" href="#doctor-content">Pular para o conteúdo</a>
@@ -139,83 +139,195 @@
                 </div>
                 <span class="availability-count" id="availabilityCount">5 dias</span>
               </div>
-              <p class="card-description">Ative manhã e tarde separadamente e defina o início e o fim de cada período.</p>
+              <p class="card-description">Selecione os turnos em que atende e escolha os horários nos menus (intervalos de 15 minutos).</p>
               <form id="availabilityForm" class="availability-form">
                 <div class="availability-row" data-day="monday">
-                  <strong class="availability-day">Segunda-feira</strong>
-                  <div class="availability-period" data-period="morning">
-                    <label><input type="checkbox" checked> <span>Manhã</span></label>
-                    <div class="availability-times"><input aria-label="Início da manhã — Segunda-feira" type="time" value="08:00"><span>até</span><input aria-label="Fim da manhã — Segunda-feira" type="time" value="12:00"></div>
-                  </div>
-                  <div class="availability-period" data-period="afternoon">
-                    <label><input type="checkbox" checked> <span>Tarde</span></label>
-                    <div class="availability-times"><input aria-label="Início da tarde — Segunda-feira" type="time" value="13:00"><span>até</span><input aria-label="Fim da tarde — Segunda-feira" type="time" value="18:00"></div>
+                  <div class="availability-day-heading"><strong class="availability-day">Segunda-feira</strong><span class="availability-day-status"></span></div>
+                  <div class="availability-periods">
+                  <section class="availability-period" data-period="morning">
+                    <div class="availability-period-heading">
+                      <h4 class="availability-period-name">Manhã</h4>
+                      <label class="availability-toggle"><input type="checkbox" checked aria-label="Atender de manhã — Segunda-feira"><span class="availability-switch" aria-hidden="true"></span><span class="availability-toggle-text">Atendo</span></label>
+                    </div>
+                    <div class="availability-times">
+                      <label><span>Início</span><select data-default="08:00" aria-label="Horário de início da manhã — Segunda-feira"></select></label>
+                      <span class="availability-range-word">até</span>
+                      <label><span>Fim</span><select data-default="12:00" aria-label="Horário de fim da manhã — Segunda-feira"></select></label>
+                    </div>
+                  </section>
+                  <section class="availability-period" data-period="afternoon">
+                    <div class="availability-period-heading">
+                      <h4 class="availability-period-name">Tarde</h4>
+                      <label class="availability-toggle"><input type="checkbox" checked aria-label="Atender de tarde — Segunda-feira"><span class="availability-switch" aria-hidden="true"></span><span class="availability-toggle-text">Atendo</span></label>
+                    </div>
+                    <div class="availability-times">
+                      <label><span>Início</span><select data-default="13:00" aria-label="Horário de início da tarde — Segunda-feira"></select></label>
+                      <span class="availability-range-word">até</span>
+                      <label><span>Fim</span><select data-default="18:00" aria-label="Horário de fim da tarde — Segunda-feira"></select></label>
+                    </div>
+                  </section>
                   </div>
                 </div>
                 <div class="availability-row" data-day="tuesday">
-                  <strong class="availability-day">Terça-feira</strong>
-                  <div class="availability-period" data-period="morning">
-                    <label><input type="checkbox" checked> <span>Manhã</span></label>
-                    <div class="availability-times"><input aria-label="Início da manhã — Terça-feira" type="time" value="08:00"><span>até</span><input aria-label="Fim da manhã — Terça-feira" type="time" value="12:00"></div>
-                  </div>
-                  <div class="availability-period" data-period="afternoon">
-                    <label><input type="checkbox" checked> <span>Tarde</span></label>
-                    <div class="availability-times"><input aria-label="Início da tarde — Terça-feira" type="time" value="13:00"><span>até</span><input aria-label="Fim da tarde — Terça-feira" type="time" value="18:00"></div>
+                  <div class="availability-day-heading"><strong class="availability-day">Terça-feira</strong><span class="availability-day-status"></span></div>
+                  <div class="availability-periods">
+                  <section class="availability-period" data-period="morning">
+                    <div class="availability-period-heading">
+                      <h4 class="availability-period-name">Manhã</h4>
+                      <label class="availability-toggle"><input type="checkbox" checked aria-label="Atender de manhã — Terça-feira"><span class="availability-switch" aria-hidden="true"></span><span class="availability-toggle-text">Atendo</span></label>
+                    </div>
+                    <div class="availability-times">
+                      <label><span>Início</span><select data-default="08:00" aria-label="Horário de início da manhã — Terça-feira"></select></label>
+                      <span class="availability-range-word">até</span>
+                      <label><span>Fim</span><select data-default="12:00" aria-label="Horário de fim da manhã — Terça-feira"></select></label>
+                    </div>
+                  </section>
+                  <section class="availability-period" data-period="afternoon">
+                    <div class="availability-period-heading">
+                      <h4 class="availability-period-name">Tarde</h4>
+                      <label class="availability-toggle"><input type="checkbox" checked aria-label="Atender de tarde — Terça-feira"><span class="availability-switch" aria-hidden="true"></span><span class="availability-toggle-text">Atendo</span></label>
+                    </div>
+                    <div class="availability-times">
+                      <label><span>Início</span><select data-default="13:00" aria-label="Horário de início da tarde — Terça-feira"></select></label>
+                      <span class="availability-range-word">até</span>
+                      <label><span>Fim</span><select data-default="18:00" aria-label="Horário de fim da tarde — Terça-feira"></select></label>
+                    </div>
+                  </section>
                   </div>
                 </div>
                 <div class="availability-row" data-day="wednesday">
-                  <strong class="availability-day">Quarta-feira</strong>
-                  <div class="availability-period" data-period="morning">
-                    <label><input type="checkbox" checked> <span>Manhã</span></label>
-                    <div class="availability-times"><input aria-label="Início da manhã — Quarta-feira" type="time" value="08:00"><span>até</span><input aria-label="Fim da manhã — Quarta-feira" type="time" value="12:00"></div>
-                  </div>
-                  <div class="availability-period" data-period="afternoon">
-                    <label><input type="checkbox" checked> <span>Tarde</span></label>
-                    <div class="availability-times"><input aria-label="Início da tarde — Quarta-feira" type="time" value="13:00"><span>até</span><input aria-label="Fim da tarde — Quarta-feira" type="time" value="18:00"></div>
+                  <div class="availability-day-heading"><strong class="availability-day">Quarta-feira</strong><span class="availability-day-status"></span></div>
+                  <div class="availability-periods">
+                  <section class="availability-period" data-period="morning">
+                    <div class="availability-period-heading">
+                      <h4 class="availability-period-name">Manhã</h4>
+                      <label class="availability-toggle"><input type="checkbox" checked aria-label="Atender de manhã — Quarta-feira"><span class="availability-switch" aria-hidden="true"></span><span class="availability-toggle-text">Atendo</span></label>
+                    </div>
+                    <div class="availability-times">
+                      <label><span>Início</span><select data-default="08:00" aria-label="Horário de início da manhã — Quarta-feira"></select></label>
+                      <span class="availability-range-word">até</span>
+                      <label><span>Fim</span><select data-default="12:00" aria-label="Horário de fim da manhã — Quarta-feira"></select></label>
+                    </div>
+                  </section>
+                  <section class="availability-period" data-period="afternoon">
+                    <div class="availability-period-heading">
+                      <h4 class="availability-period-name">Tarde</h4>
+                      <label class="availability-toggle"><input type="checkbox" checked aria-label="Atender de tarde — Quarta-feira"><span class="availability-switch" aria-hidden="true"></span><span class="availability-toggle-text">Atendo</span></label>
+                    </div>
+                    <div class="availability-times">
+                      <label><span>Início</span><select data-default="13:00" aria-label="Horário de início da tarde — Quarta-feira"></select></label>
+                      <span class="availability-range-word">até</span>
+                      <label><span>Fim</span><select data-default="18:00" aria-label="Horário de fim da tarde — Quarta-feira"></select></label>
+                    </div>
+                  </section>
                   </div>
                 </div>
                 <div class="availability-row" data-day="thursday">
-                  <strong class="availability-day">Quinta-feira</strong>
-                  <div class="availability-period" data-period="morning">
-                    <label><input type="checkbox" checked> <span>Manhã</span></label>
-                    <div class="availability-times"><input aria-label="Início da manhã — Quinta-feira" type="time" value="08:00"><span>até</span><input aria-label="Fim da manhã — Quinta-feira" type="time" value="12:00"></div>
-                  </div>
-                  <div class="availability-period" data-period="afternoon">
-                    <label><input type="checkbox" checked> <span>Tarde</span></label>
-                    <div class="availability-times"><input aria-label="Início da tarde — Quinta-feira" type="time" value="13:00"><span>até</span><input aria-label="Fim da tarde — Quinta-feira" type="time" value="18:00"></div>
+                  <div class="availability-day-heading"><strong class="availability-day">Quinta-feira</strong><span class="availability-day-status"></span></div>
+                  <div class="availability-periods">
+                  <section class="availability-period" data-period="morning">
+                    <div class="availability-period-heading">
+                      <h4 class="availability-period-name">Manhã</h4>
+                      <label class="availability-toggle"><input type="checkbox" checked aria-label="Atender de manhã — Quinta-feira"><span class="availability-switch" aria-hidden="true"></span><span class="availability-toggle-text">Atendo</span></label>
+                    </div>
+                    <div class="availability-times">
+                      <label><span>Início</span><select data-default="08:00" aria-label="Horário de início da manhã — Quinta-feira"></select></label>
+                      <span class="availability-range-word">até</span>
+                      <label><span>Fim</span><select data-default="12:00" aria-label="Horário de fim da manhã — Quinta-feira"></select></label>
+                    </div>
+                  </section>
+                  <section class="availability-period" data-period="afternoon">
+                    <div class="availability-period-heading">
+                      <h4 class="availability-period-name">Tarde</h4>
+                      <label class="availability-toggle"><input type="checkbox" checked aria-label="Atender de tarde — Quinta-feira"><span class="availability-switch" aria-hidden="true"></span><span class="availability-toggle-text">Atendo</span></label>
+                    </div>
+                    <div class="availability-times">
+                      <label><span>Início</span><select data-default="13:00" aria-label="Horário de início da tarde — Quinta-feira"></select></label>
+                      <span class="availability-range-word">até</span>
+                      <label><span>Fim</span><select data-default="18:00" aria-label="Horário de fim da tarde — Quinta-feira"></select></label>
+                    </div>
+                  </section>
                   </div>
                 </div>
                 <div class="availability-row" data-day="friday">
-                  <strong class="availability-day">Sexta-feira</strong>
-                  <div class="availability-period" data-period="morning">
-                    <label><input type="checkbox" checked> <span>Manhã</span></label>
-                    <div class="availability-times"><input aria-label="Início da manhã — Sexta-feira" type="time" value="08:00"><span>até</span><input aria-label="Fim da manhã — Sexta-feira" type="time" value="12:00"></div>
-                  </div>
-                  <div class="availability-period" data-period="afternoon">
-                    <label><input type="checkbox" checked> <span>Tarde</span></label>
-                    <div class="availability-times"><input aria-label="Início da tarde — Sexta-feira" type="time" value="13:00"><span>até</span><input aria-label="Fim da tarde — Sexta-feira" type="time" value="18:00"></div>
+                  <div class="availability-day-heading"><strong class="availability-day">Sexta-feira</strong><span class="availability-day-status"></span></div>
+                  <div class="availability-periods">
+                  <section class="availability-period" data-period="morning">
+                    <div class="availability-period-heading">
+                      <h4 class="availability-period-name">Manhã</h4>
+                      <label class="availability-toggle"><input type="checkbox" checked aria-label="Atender de manhã — Sexta-feira"><span class="availability-switch" aria-hidden="true"></span><span class="availability-toggle-text">Atendo</span></label>
+                    </div>
+                    <div class="availability-times">
+                      <label><span>Início</span><select data-default="08:00" aria-label="Horário de início da manhã — Sexta-feira"></select></label>
+                      <span class="availability-range-word">até</span>
+                      <label><span>Fim</span><select data-default="12:00" aria-label="Horário de fim da manhã — Sexta-feira"></select></label>
+                    </div>
+                  </section>
+                  <section class="availability-period" data-period="afternoon">
+                    <div class="availability-period-heading">
+                      <h4 class="availability-period-name">Tarde</h4>
+                      <label class="availability-toggle"><input type="checkbox" checked aria-label="Atender de tarde — Sexta-feira"><span class="availability-switch" aria-hidden="true"></span><span class="availability-toggle-text">Atendo</span></label>
+                    </div>
+                    <div class="availability-times">
+                      <label><span>Início</span><select data-default="13:00" aria-label="Horário de início da tarde — Sexta-feira"></select></label>
+                      <span class="availability-range-word">até</span>
+                      <label><span>Fim</span><select data-default="18:00" aria-label="Horário de fim da tarde — Sexta-feira"></select></label>
+                    </div>
+                  </section>
                   </div>
                 </div>
                 <div class="availability-row" data-day="saturday">
-                  <strong class="availability-day">Sábado</strong>
-                  <div class="availability-period" data-period="morning">
-                    <label><input type="checkbox" checked> <span>Manhã</span></label>
-                    <div class="availability-times"><input aria-label="Início da manhã — Sábado" type="time" value="08:00"><span>até</span><input aria-label="Fim da manhã — Sábado" type="time" value="12:00"></div>
-                  </div>
-                  <div class="availability-period" data-period="afternoon">
-                    <label><input type="checkbox"> <span>Tarde</span></label>
-                    <div class="availability-times"><input aria-label="Início da tarde — Sábado" type="time" value="13:00"><span>até</span><input aria-label="Fim da tarde — Sábado" type="time" value="18:00"></div>
+                  <div class="availability-day-heading"><strong class="availability-day">Sábado</strong><span class="availability-day-status"></span></div>
+                  <div class="availability-periods">
+                  <section class="availability-period" data-period="morning">
+                    <div class="availability-period-heading">
+                      <h4 class="availability-period-name">Manhã</h4>
+                      <label class="availability-toggle"><input type="checkbox" checked aria-label="Atender de manhã — Sábado"><span class="availability-switch" aria-hidden="true"></span><span class="availability-toggle-text">Atendo</span></label>
+                    </div>
+                    <div class="availability-times">
+                      <label><span>Início</span><select data-default="08:00" aria-label="Horário de início da manhã — Sábado"></select></label>
+                      <span class="availability-range-word">até</span>
+                      <label><span>Fim</span><select data-default="12:00" aria-label="Horário de fim da manhã — Sábado"></select></label>
+                    </div>
+                  </section>
+                  <section class="availability-period" data-period="afternoon">
+                    <div class="availability-period-heading">
+                      <h4 class="availability-period-name">Tarde</h4>
+                      <label class="availability-toggle"><input type="checkbox" aria-label="Atender de tarde — Sábado"><span class="availability-switch" aria-hidden="true"></span><span class="availability-toggle-text">Atendo</span></label>
+                    </div>
+                    <div class="availability-times">
+                      <label><span>Início</span><select data-default="13:00" aria-label="Horário de início da tarde — Sábado"></select></label>
+                      <span class="availability-range-word">até</span>
+                      <label><span>Fim</span><select data-default="18:00" aria-label="Horário de fim da tarde — Sábado"></select></label>
+                    </div>
+                  </section>
                   </div>
                 </div>
                 <div class="availability-row" data-day="sunday">
-                  <strong class="availability-day">Domingo</strong>
-                  <div class="availability-period" data-period="morning">
-                    <label><input type="checkbox"> <span>Manhã</span></label>
-                    <div class="availability-times"><input aria-label="Início da manhã — Domingo" type="time" value="08:00"><span>até</span><input aria-label="Fim da manhã — Domingo" type="time" value="12:00"></div>
-                  </div>
-                  <div class="availability-period" data-period="afternoon">
-                    <label><input type="checkbox"> <span>Tarde</span></label>
-                    <div class="availability-times"><input aria-label="Início da tarde — Domingo" type="time" value="13:00"><span>até</span><input aria-label="Fim da tarde — Domingo" type="time" value="18:00"></div>
+                  <div class="availability-day-heading"><strong class="availability-day">Domingo</strong><span class="availability-day-status"></span></div>
+                  <div class="availability-periods">
+                  <section class="availability-period" data-period="morning">
+                    <div class="availability-period-heading">
+                      <h4 class="availability-period-name">Manhã</h4>
+                      <label class="availability-toggle"><input type="checkbox" aria-label="Atender de manhã — Domingo"><span class="availability-switch" aria-hidden="true"></span><span class="availability-toggle-text">Atendo</span></label>
+                    </div>
+                    <div class="availability-times">
+                      <label><span>Início</span><select data-default="08:00" aria-label="Horário de início da manhã — Domingo"></select></label>
+                      <span class="availability-range-word">até</span>
+                      <label><span>Fim</span><select data-default="12:00" aria-label="Horário de fim da manhã — Domingo"></select></label>
+                    </div>
+                  </section>
+                  <section class="availability-period" data-period="afternoon">
+                    <div class="availability-period-heading">
+                      <h4 class="availability-period-name">Tarde</h4>
+                      <label class="availability-toggle"><input type="checkbox" aria-label="Atender de tarde — Domingo"><span class="availability-switch" aria-hidden="true"></span><span class="availability-toggle-text">Atendo</span></label>
+                    </div>
+                    <div class="availability-times">
+                      <label><span>Início</span><select data-default="13:00" aria-label="Horário de início da tarde — Domingo"></select></label>
+                      <span class="availability-range-word">até</span>
+                      <label><span>Fim</span><select data-default="18:00" aria-label="Horário de fim da tarde — Domingo"></select></label>
+                    </div>
+                  </section>
                   </div>
                 </div>
                 <button class="btn btn-primary btn-block" type="submit" id="saveAvailability">Salvar meus horários</button>
@@ -232,7 +344,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js?v=4"></script>
   <script src="js/accessibility.js?v=2"></script>
-  <script src="js/doctor.js?v=6"></script>
+  <script src="js/doctor.js?v=7"></script>
   <script src="https://vlibras.gov.br/app/vlibras-plugin.js" defer></script>
 </body>
 </html>
